@@ -1,0 +1,3744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Furnish Market — Ads Dashboard</title>
+<meta name="viewport" content="width=1728" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Dashboard prototype — original "Furnish Market" brand
+   Visual direction: purple accent, Sofia Sans, three-point status system
+   Inspired by the case study samples. */
+
+:root {
+  /* Icon size tokens — single source of truth */
+  --icon-xs: 12px;
+  --icon-sm: 14px;
+  --icon-md: 18px;
+  --icon-lg: 22px;
+
+  --bg: #0f0d12;
+  --bg-2: #171419;
+  --panel: #ffffff;
+  --panel-ink: #141018;
+  --ink: #141018;
+  --ink-2: #4a4550;
+  --ink-3: #8a8690;
+  --line: #e7e4ea;
+  --line-2: #f1eff3;
+
+  --accent: #782b7f;       /* primary purple */
+  --accent-2: #9747ff;     /* bright purple */
+  --accent-soft: #f4e9f6;
+  --accent-softer: #fbf4fd;
+
+  --good: #4e8747;
+  --good-soft: #def3e6;
+  --warn: #a59726;
+  --warn-soft: #faf2b4;
+  --bad:  #c54549;
+  --bad-soft: #f3dede;
+
+  --shadow-card: 1px 7px 16px rgba(0,0,0,.07), 6px 29px 29px rgba(0,0,0,.04);
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 14px;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Sofia Sans", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* Shell */
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.sidebar {
+  width: 72px;
+  background: #ffffff;
+  box-shadow: 1px 0px 8.7px 0px rgba(0,0,0,0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 20;
+}
+.sidebar .nav-hamburger {
+  color: #676767;
+  width: 44px; height: 36px;
+  margin-bottom: 6px;
+}
+.sidebar .nav-hamburger svg { font-size: 22px; }
+.sidebar .logo-dot {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent);
+  display: grid; place-items: center;
+  color: #fff; font-weight: 800; font-size: 17px;
+  letter-spacing: 0;
+}
+.sidebar .nav {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 4px; width: 100%;
+  align-items: center;
+  flex: 1;
+}
+.sidebar .nav-item {
+  width: 44px; height: 38px; border-radius: 8px;
+  display: grid; place-items: center;
+  color: #676767;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.sidebar .nav-item svg { font-size: 22px; }
+.sidebar .nav-item:hover { background: var(--accent-softer); color: var(--accent); }
+.sidebar .nav-item.active { color: var(--accent); }
+.sidebar .nav-item.active svg { color: var(--accent); }
+
+.content {
+  flex: 1;
+  min-width: 0;
+  background: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 40px;
+  border-bottom: 1px solid #f1eff3;
+  background: #fff;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar .brand {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; font-size: 17px; color: var(--ink);
+}
+.topbar .brand .brand-mark {
+  width: 26px; height: 26px; object-fit: contain;
+  display: block;
+}
+.topbar .brand .wm {
+  height: 22px; padding: 0 10px; border-radius: 4px;
+  background: var(--accent); color: #fff; display: grid; place-items: center;
+  font-weight: 800; font-size: 15px; letter-spacing: .02em;
+}
+.topbar .brand .divider {
+  color: var(--ink-3); font-weight: 400;
+}
+.topbar .right { display: flex; gap: 14px; align-items: center; color: var(--ink-2); font-size: 15px; }
+.topbar { font-size: 15px; }
+.topbar svg { font-size: var(--icon-sm); }
+.topbar .avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, #b57ac2, #782b7f);
+  color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px;
+}
+
+/* Breadcrumb / title */
+.page-head {
+  padding: 28px 40px 8px;
+}
+.breadcrumb {
+  font-size: 15px; color: var(--ink-3);
+  display: flex; gap: 8px; align-items: center;
+}
+.breadcrumb .sep { color: var(--ink-3); }
+.breadcrumb svg { font-size: var(--icon-xs); }
+.breadcrumb .current { color: var(--ink); font-weight: 500; }
+.page-head h1 {
+  font-size: 28px; font-weight: 700; margin: 6px 0 0; letter-spacing: -0.02em;
+}
+
+/* Goal tabs row — matches Figma: pill buttons, 0.5px grey border, purple fill when active */
+.goal-tabs {
+  padding: 16px 40px 0;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: none;
+}
+.goal-tab {
+  font-family: "Sofia Sans", ui-sans-serif, system-ui, sans-serif;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 0.5px solid rgb(190,190,190);
+  background: #fff;
+  color: rgb(190,190,190);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background-color .15s, color .15s, border-color .15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.goal-tab:hover {
+  color: #676767;
+  border-color: #9c9c9c;
+}
+.goal-tab.active {
+  background: rgb(120,43,127);
+  color: #fff;
+  border-color: rgb(120,43,127);
+}
+.goal-tab svg { display: none; }
+.goal-tab .dot { display: none; }
+.goal-tab .count {
+  display: inline-grid; place-items: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  font-size: 13px; font-weight: 600;
+  border-radius: 999px;
+  background: rgba(190,190,190,0.25);
+  color: inherit;
+  letter-spacing: 0;
+}
+.goal-tab.active .count {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
+
+/* Subnav under H1 */
+.subnav {
+  padding: 0 40px;
+  display: flex; gap: 32px;
+  border-bottom: 1px solid #ededed;
+  margin-top: 14px;
+}
+.subnav a {
+  padding: 10px 0; font-size: 16px; color: var(--ink-2);
+  text-decoration: none; position: relative;
+  cursor: pointer;
+}
+.subnav a.active {
+  color: var(--accent); font-weight: 600;
+}
+.subnav a.active::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+  height: 2px; background: var(--accent);
+}
+
+/* Main dashboard body */
+.dash {
+  padding: 24px 40px 80px;
+  display: flex; flex-direction: column; gap: 24px;
+}
+
+/* AdVantage score card */
+.advantage-row {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 18px;
+}
+.advantage-card {
+  background: linear-gradient(135deg, #fbf4fd 0%, #f4e9f6 100%);
+  border: 1px solid #ecd9f0;
+  border-radius: var(--radius-l);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.advantage-card .label {
+  font-size: 14px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--accent); font-weight: 600;
+}
+.advantage-card .gauge {
+  display: flex; align-items: center; gap: 18px;
+}
+.gauge-ring {
+  width: 96px; height: 96px; position: relative;
+  flex-shrink: 0;
+}
+.gauge-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.gauge-ring .val {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.advantage-card .txt {
+  font-size: 15px; color: var(--ink-2); line-height: 1.4;
+}
+.advantage-card .txt strong { color: var(--ink); font-weight: 600; }
+.advantage-card .cta {
+  margin-top: 2px;
+  font-size: 15px; color: var(--accent); font-weight: 600;
+  cursor: pointer; background: none; border: none; padding: 0;
+  text-decoration: underline;
+  align-self: flex-start;
+}
+
+/* KPI tiles */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.kpi {
+  font-family: "Sofia Sans", ui-sans-serif, system-ui, sans-serif;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px 18px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+  position: relative;
+  min-height: 148px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.kpi:hover { border-color: #9c9c9c; box-shadow: 0 4px 14px rgba(0,0,0,0.04); }
+.kpi .k-label {
+  font-size: 14px; color: var(--ink-2); font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  line-height: 1.2;
+  display: flex; align-items: center; gap: 6px;
+}
+.kpi .k-label .i {
+  width: 16px; height: 16px;
+  color: var(--accent);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: help; flex-shrink: 0;
+  font-size: 16px;
+  transition: opacity .12s;
+}
+.kpi .k-label .i:hover { opacity: 0.75; }
+.kpi .k-label .i svg { width: 1em; height: 1em; stroke-width: 2.2; }
+.kpi .k-val {
+  font-size: 34px; font-weight: 700; letter-spacing: -0.03em;
+  color: var(--ink); line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  margin-top: auto;
+}
+.kpi .k-delta {
+  font-size: 14px; font-weight: 500; letter-spacing: 0;
+  color: var(--ink-3); line-height: 1.3;
+  display: inline-flex; align-items: center; gap: 6px;
+  align-self: flex-start;
+}
+.kpi .k-delta .arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 10px; flex-shrink: 0;
+}
+.kpi .k-delta .arrow svg { width: 100%; height: 100%; }
+.kpi .k-delta.up .arrow { color: var(--good); }
+.kpi .k-delta.up .pct { color: var(--good); }
+.kpi .k-delta.down .arrow { color: var(--bad); transform: scaleY(-1); }
+.kpi .k-delta.down .pct { color: var(--bad); }
+.kpi .k-delta.flat .arrow { color: var(--ink-3); }
+.kpi .k-delta .pct { font-weight: 700; }
+.kpi.highlight { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-softer); }
+.kpi .k-foot { display: none; }
+
+/* Chart */
+.chart-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 18px 20px 10px;
+}
+.chart-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 10px;
+}
+.chart-head h3 {
+  margin: 0; font-size: 16px; font-weight: 600;
+}
+.chart-legend {
+  display: flex; gap: 14px; align-items: center;
+  font-size: 14px; color: var(--ink-2);
+}
+.chart-legend span { display: inline-flex; gap: 6px; align-items: center; }
+.chart-legend i {
+  width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+}
+
+/* Table */
+.section-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 4px;
+}
+.section-head h2 { font-size: 18px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
+.section-head .hint { font-size: 15px; color: var(--ink-3); }
+
+.table-wrap {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.table-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.table-toolbar .searchbar svg { font-size: var(--icon-sm); color: var(--ink-3); }
+.table-toolbar .searchbar {
+  display: flex; align-items: center; gap: 8px;
+  background: #fafafc; border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 10px;
+  width: 320px;
+}
+.table-toolbar .searchbar input {
+  border: none; background: transparent; outline: none;
+  font-family: inherit; font-size: 15px; flex: 1;
+}
+.chip-row { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; align-items: center; }
+.chip {
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: #fff;
+  font-size: 14px; font-weight: 500; color: var(--ink-2);
+  cursor: pointer;
+  display: inline-flex; gap: 6px; align-items: center;
+}
+.chip:hover { border-color: var(--ink-3); }
+.chip.active {
+  background: var(--accent-soft); color: var(--accent); border-color: #d8bbde;
+}
+.chip .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.chip svg { font-size: var(--icon-xs); }
+.chip .dot.good { background: var(--good); }
+.chip .dot.warn { background: var(--warn); }
+.chip .dot.bad { background: var(--bad); }
+
+.toolbar-spacer { flex: 1; }
+.popover-host { position: relative; display: inline-block; }
+.chip-tool { font-weight: 600; }
+.chip-tool .filter-badge,
+.btn-tool .filter-badge {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); display: inline-block;
+}
+
+/* Filter button — sits next to the search bar */
+.btn-tool {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 14px;
+  border-radius: 8px; border: 1px solid var(--line); background: #fff;
+  font-family: inherit; font-size: 15px; font-weight: 600; color: var(--ink-2);
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.btn-tool:hover { border-color: var(--ink-3); background: #fafafc; }
+.btn-tool.active {
+  background: var(--accent-soft); color: var(--accent); border-color: #d8bbde;
+}
+.btn-tool svg { width: 14px; height: 14px; }
+
+/* Customize columns — compact icon-led ghost button */
+.btn-cols {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 10px;
+  border-radius: 6px; border: 1px solid transparent; background: transparent;
+  font-family: inherit; font-size: 14px; font-weight: 500; color: var(--ink-3);
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.btn-cols:hover { background: #f3f4f6; color: var(--ink); }
+.btn-cols.active {
+  background: var(--accent-soft); color: var(--accent); border-color: #e5d2eb;
+}
+.btn-cols svg { color: currentColor; }
+.popover {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  width: 300px; background: #fff;
+  border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 50; padding: 14px 16px;
+}
+.popover-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.popover-head h5 {
+  margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink);
+}
+.po-close {
+  cursor: pointer; color: var(--ink-3); display: inline-grid; place-items: center;
+  width: 22px; height: 22px; border-radius: 6px;
+}
+.po-close:hover { background: var(--line-2); color: var(--ink); }
+.po-close svg { font-size: 16px; }
+.po-section { padding: 10px 0; border-top: 1px solid var(--line-2); }
+.po-section:first-of-type { border-top: none; padding-top: 0; }
+.po-label {
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.po-row {
+  display: flex; gap: 8px; align-items: center;
+  padding: 5px 0; cursor: pointer; font-size: 15px; color: var(--ink);
+}
+.po-row.disabled { cursor: default; color: var(--ink-2); }
+.po-row input[type="checkbox"] {
+  width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer;
+}
+.po-row.disabled input[type="checkbox"] { cursor: default; }
+.po-slider {
+  width: 100%; accent-color: var(--accent); cursor: pointer;
+}
+.po-foot {
+  display: flex; justify-content: space-between; gap: 8px;
+  padding-top: 12px; border-top: 1px solid var(--line-2); margin-top: 4px;
+}
+.po-foot .btn { padding: 6px 14px; font-size: 14px; }
+
+table.campaigns {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+table.campaigns thead th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 500;
+  color: var(--ink-2);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #faf8fb;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+}
+table.campaigns tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line-2);
+  color: var(--ink);
+  vertical-align: middle;
+}
+table.campaigns tbody tr { cursor: pointer; transition: background .12s; }
+table.campaigns tbody tr:hover { background: #fbf9fc; }
+table.campaigns tbody tr.expanded { background: #fbf7fd; }
+table.campaigns tbody tr.expanded td { border-bottom-color: transparent; }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  font-size: 14px; font-weight: 500;
+  white-space: nowrap;
+}
+.status-pill .d {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.status-pill svg { font-size: var(--icon-xs); }
+.status-pill.good { background: var(--good-soft); color: var(--good); }
+.status-pill.good .d { background: var(--good); }
+.status-pill.warn { background: var(--warn-soft); color: #857718; }
+.status-pill.warn .d { background: var(--warn); }
+.status-pill.bad { background: var(--bad-soft); color: var(--bad); }
+.status-pill.bad .d { background: var(--bad); }
+
+.insight-cell {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--ink-2);
+  font-size: 14.5px;
+  position: relative;
+}
+.insight-cell .ico {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: inline-grid; place-items: center;
+  flex-shrink: 0;
+  font-size: var(--icon-xs);
+}
+.insight-cell.bad .ico { background: var(--bad-soft); color: var(--bad); }
+.insight-cell.warn .ico { background: var(--warn-soft); color: #857718; }
+.insight-cell.good .ico { background: var(--good-soft); color: var(--good); }
+
+.campaign-name {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.campaign-name .nm {
+  font-weight: 600; color: var(--ink); font-size: 15.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.campaign-name .sub {
+  font-size: 13.5px; color: var(--ink-3);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.active-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+.active-dot.on {
+  background: rgb(70,120,66);
+  box-shadow: 0 0 0 2px rgba(70,120,66,0.18);
+}
+.active-dot.on::before {
+  content: ""; position: absolute; inset: -3px;
+  border-radius: 50%;
+  background: rgba(70,120,66,0.35);
+  animation: pulseDot 2s ease-out infinite;
+  z-index: -1;
+}
+.active-dot.off {
+  background: transparent;
+  border: 1.5px solid var(--ink-3);
+}
+@keyframes pulseDot {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(2); opacity: 0; }
+}
+.active-tag {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 4px;
+  line-height: 1.4;
+}
+.active-tag.on {
+  background: rgba(70,120,66,0.12);
+  color: rgb(70,120,66);
+}
+.active-tag.off {
+  background: var(--line-2);
+  color: var(--ink-2);
+}
+
+.expand-chev {
+  width: 22px; height: 22px; border-radius: 6px;
+  display: inline-grid; place-items: center;
+  background: #f4f1f7; color: var(--ink-2);
+  transition: transform .2s;
+  font-size: var(--icon-xs);
+}
+tr.expanded .expand-chev { transform: rotate(90deg); background: var(--accent-soft); color: var(--accent); }
+
+/* Expanded recommendation drawer */
+.drawer-row td { padding: 0; }
+
+/* Product breakdown */
+.product-breakdown {
+  background: #fff;
+  border-top: 1px solid var(--line);
+  padding: 20px 24px 24px;
+}
+.product-breakdown .pb-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.product-breakdown h4 {
+  margin: 0; font-size: 16px; font-weight: 700; color: var(--ink);
+}
+.product-breakdown .pb-sub {
+  font-size: 14px; color: var(--ink-3);
+}
+.pb-table {
+  width: 100%; border-collapse: collapse;
+  background: #fafafc; border-radius: var(--radius-l);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.pb-table th {
+  text-align: left; font-size: 13px; font-weight: 600;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em;
+  padding: 10px 14px;
+  background: #f4f4f7;
+  border-bottom: 1px solid var(--line);
+}
+.pb-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  vertical-align: middle;
+}
+.pb-table tr:last-child td { border-bottom: none; }
+.pb-table tbody tr:hover { background: #fff; }
+.pb-product {
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.pb-thumb {
+  width: 36px; height: 36px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--ink-2);
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.pb-nm {
+  font-weight: 600; color: var(--ink); font-size: 15px;
+  margin-bottom: 2px;
+}
+.pb-tag {
+  display: inline-block;
+  font-size: 12px; font-weight: 600;
+  padding: 1px 6px; border-radius: 3px;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.pb-tag.good { background: var(--good-soft); color: var(--good); }
+.pb-tag.bad { background: var(--bad-soft); color: var(--bad); }
+.pb-roas {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.pb-roas.good { color: var(--good); }
+.pb-roas.warn { color: var(--warn); }
+.pb-roas.bad { color: var(--bad); }
+.pb-rec {
+  display: inline-flex; align-items: flex-start; gap: 6px;
+  font-size: 14px; line-height: 1.35;
+  max-width: 240px;
+}
+.pb-rec-icon {
+  flex-shrink: 0;
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  margin-top: 1px;
+}
+.pb-rec.good .pb-rec-icon { background: var(--good-soft); color: var(--good); }
+.pb-rec.warn .pb-rec-icon { background: var(--warn-soft); color: var(--warn); }
+.pb-rec.bad .pb-rec-icon { background: var(--bad-soft); color: var(--bad); }
+.pb-rec-text {
+  color: var(--ink); font-weight: 500;
+}
+
+/* Product-mode rollup cell */
+.rollup-cell {
+  display: flex; flex-direction: column; gap: 6px;
+  min-width: 180px;
+}
+.rollup-bar {
+  display: flex; height: 6px; border-radius: 3px; overflow: hidden;
+  background: var(--line-2);
+}
+.rollup-bar .seg { display: block; height: 100%; }
+.rollup-bar .seg.bad { background: var(--bad); }
+.rollup-bar .seg.warn { background: var(--warn); }
+.rollup-bar .seg.good { background: var(--good); }
+.rollup-text {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  font-size: 13.5px; color: var(--ink-2);
+}
+.rollup-text .rt b { font-weight: 700; }
+.rollup-text .rt.bad { color: var(--bad); }
+.rollup-text .rt.warn { color: var(--warn); }
+.rollup-text .rt.good { color: var(--good); }
+.rollup-text .rt.sub { color: var(--ink-3); }
+
+/* Per-product action drawer */
+.expand-chev.open { transform: rotate(90deg); }
+.pb-table tr.pb-expanded {
+  background: #faf5fb !important;
+}
+.pb-take-action {
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 6px;
+  padding: 6px 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pb-take-action:hover { background: #6a2570; }
+.pb-drawer-row td {
+  padding: 0 !important;
+  background: #fbf4fd;
+  border-bottom: 1px solid var(--line);
+}
+.product-action {
+  padding: 18px 20px;
+  border-left: 3px solid var(--accent);
+}
+.product-action.bad { border-left-color: var(--bad); }
+.product-action.warn { border-left-color: var(--warn); }
+.product-action.good { border-left-color: var(--good); }
+.pa-head {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 8px;
+}
+.pa-icon {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: #fff; border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.product-action.bad .pa-icon { color: var(--bad); }
+.product-action.warn .pa-icon { color: var(--warn); }
+.product-action.good .pa-icon { color: var(--good); }
+.pa-eyebrow {
+  font-size: 13px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pa-titles { flex: 1; min-width: 0; }
+.pa-title {
+  font-size: 17px; font-weight: 700; color: var(--ink);
+  line-height: 1.3;
+}
+.pa-body {
+  font-size: 15px; color: var(--ink-2);
+  line-height: 1.5; margin-bottom: 14px;
+  max-width: 720px;
+}
+.pa-lever {
+  display: flex; align-items: center; gap: 16px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 8px; padding: 12px 16px;
+  margin-bottom: 14px;
+}
+.pa-lever-col { display: flex; flex-direction: column; gap: 2px; }
+.pa-lever-label {
+  font-size: 12px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .08em; font-weight: 600;
+}
+.pa-lever-label.suggested { color: var(--accent); }
+.pa-lever-from {
+  font-size: 18px; font-weight: 700; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.pa-lever-to {
+  font-size: 18px; font-weight: 700; color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.pa-arrow {
+  font-size: 18px; color: var(--accent); font-weight: 700;
+}
+.pa-lift {
+  flex: 1; text-align: right;
+  font-size: 14px; color: var(--good); font-weight: 600;
+}
+.pa-actions {
+  display: flex; gap: 8px;
+}
+.pa-frontier-toggle {
+  background: none; border: none; padding: 0;
+  color: var(--accent); font-weight: 600; font-size: 13px;
+  cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-bottom: 14px;
+}
+.pa-frontier-toggle:hover { text-decoration: underline; }
+.pa-frontier-top {
+  display: flex; align-items: flex-start; gap: 24px;
+}
+.pa-frontier-text { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+.pa-frontier-top .frontier-wrap { flex: 1 1 260px; min-width: 0; max-width: 360px; }
+.pa-frontier-top .frontier-wrap svg { height: 190px; }
+.pa-frontier {
+  background: #fafafa; border: 1px solid var(--line);
+  border-radius: 8px; padding: 16px 18px; margin-bottom: 14px;
+}
+
+/* Product Detail screen */
+.product-detail {
+  display: flex; flex-direction: column; gap: 0;
+  font-family: "Sofia Sans", ui-sans-serif, system-ui, sans-serif;
+}
+.pd-back-bar {
+  display: flex; align-items: center; gap: 18px;
+  margin-bottom: 18px;
+}
+.pd-back {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px;
+  font-size: 15px; font-weight: 600; color: var(--ink);
+  cursor: pointer; font-family: inherit;
+}
+.pd-back:hover { border-color: var(--accent); color: var(--accent); }
+.pd-breadcrumbs {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--ink-3);
+}
+.bc-sep { color: var(--ink-3); opacity: .5; }
+.bc.current { color: var(--ink); font-weight: 600; }
+
+.pd-hero {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 24px;
+  padding: 22px 0 20px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.pd-hero-left { flex: 1; min-width: 0; }
+.pd-eyebrow {
+  font-size: 13px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .08em; font-weight: 600;
+  margin-bottom: 6px;
+}
+.pd-title {
+  font-size: 28px; font-weight: 700; color: var(--ink);
+  letter-spacing: -0.02em; margin: 0 0 12px;
+  line-height: 1.15;
+}
+.pd-meta {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  font-size: 15px; color: var(--ink-2);
+}
+.pd-divider {
+  width: 1px; height: 14px; background: var(--line);
+}
+.pd-meta-item strong { color: var(--ink); font-weight: 600; }
+.pd-hero-right {
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+.pd-cta { font-size: 15px; }
+
+.pd-tabs {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.pd-tab {
+  background: transparent; border: none;
+  padding: 10px 14px; cursor: pointer;
+  font-size: 15px; font-weight: 600; color: var(--ink-3);
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.pd-tab:hover { color: var(--ink); }
+.pd-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.pd-content { display: flex; flex-direction: column; gap: 18px; }
+
+.pd-kpi-row {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+}
+.pd-kpi {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 8px; padding: 14px 14px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pd-kpi-label {
+  font-size: 13px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+}
+.pd-kpi-val {
+  font-size: 22px; font-weight: 700; color: var(--ink);
+  letter-spacing: -0.02em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pd-kpi-val.good { color: var(--good); }
+.pd-kpi-val.warn { color: var(--warn); }
+.pd-kpi-val.bad { color: var(--bad); }
+.pd-kpi-sub { font-size: 13px; color: var(--ink-3); }
+
+.pd-chart-card, .pd-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 8px; padding: 18px 20px;
+}
+.pd-chart-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px;
+}
+.pd-chart-head h3 { font-size: 16px; font-weight: 700; margin: 0 0 2px; }
+.pd-chart-sub { font-size: 13px; color: var(--ink-3); }
+.pd-chart-legend {
+  display: flex; gap: 14px; font-size: 13px; color: var(--ink-2);
+}
+.pd-chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.pd-chart-legend i { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
+.pd-chart { width: 100%; height: 180px; display: block; }
+
+.pd-card h4 {
+  font-size: 15px; font-weight: 700; margin: 0 0 10px;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2);
+}
+.pd-cols {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+
+.pd-funnel { display: flex; flex-direction: column; gap: 10px; }
+.pd-fstep {
+  display: grid; grid-template-columns: 130px 1fr 90px;
+  align-items: center; gap: 10px;
+  font-size: 15px;
+}
+.pd-flbl { color: var(--ink-2); }
+.pd-fbar {
+  height: 8px; background: var(--accent-soft); border-radius: 4px;
+  overflow: hidden;
+}
+.pd-fbar i {
+  display: block; height: 100%; background: var(--accent);
+  border-radius: 4px;
+}
+.pd-fstep.problem .pd-fbar i { background: var(--bad); }
+.pd-fnum { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.pd-listing { display: flex; flex-direction: column; gap: 0; }
+.pd-listing-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+  font-size: 15px; color: var(--ink-2);
+}
+.pd-listing-row:last-child { border-bottom: none; }
+.pd-score { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pd-score.good { color: var(--good); }
+.pd-score.warn { color: var(--warn); }
+.pd-score.bad { color: var(--bad); }
+
+.pd-rec-hero {
+  display: flex; gap: 18px;
+  background: var(--accent-softer);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 22px 24px;
+}
+.pd-rec-hero.bad { background: #fef2f2; border-color: var(--bad); }
+.pd-rec-hero.warn { background: #fffbeb; border-color: var(--warn); }
+.pd-rec-hero.good { background: #f0fdf4; border-color: var(--good); }
+.pd-rec-icon {
+  width: 44px; height: 44px; border-radius: 8px;
+  background: #fff; border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: var(--accent);
+  flex-shrink: 0;
+}
+.pd-rec-eyebrow {
+  font-size: 13px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .08em; font-weight: 600;
+  margin-bottom: 4px;
+}
+.pd-rec-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+.pd-rec-body { font-size: 16px; color: var(--ink-2); margin: 0; line-height: 1.5; max-width: 720px; }
+
+.pd-lever {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: #fafafa;
+  border: 1px solid var(--line); border-radius: 6px;
+  font-size: 15px;
+}
+.pd-lever.picked { background: var(--accent-softer); border-color: var(--accent); }
+.pd-lever-meta { color: var(--ink-3); font-size: 14px; }
+.pd-lever-tag {
+  background: var(--accent); color: #fff;
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px; letter-spacing: .06em;
+}
+
+.pd-table {
+  width: 100%; border-collapse: collapse; font-size: 15px;
+}
+.pd-table th {
+  text-align: left; font-size: 13px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+.pd-table td {
+  padding: 10px; border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.pd-table tbody tr:last-child td { border-bottom: none; }
+
+.pd-creative-card {
+  border: 1px solid var(--line); border-radius: 8px;
+  overflow: hidden;
+}
+.pd-creative-img {
+  aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700; color: rgba(0,0,0,0.3);
+}
+.pd-creative-meta { padding: 10px 12px; }
+.drawer {
+  background: linear-gradient(180deg, #fbf4fd 0%, #fff 60%);
+  padding: 20px 28px 24px;
+  border-bottom: 1px solid var(--line-2);
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 28px;
+}
+.drawer .rec-block h4 {
+  margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--accent); font-weight: 700;
+}
+.drawer .rec-block .title {
+  font-size: 17px; font-weight: 700; margin: 0 0 10px; letter-spacing: -0.02em;
+}
+.drawer .rec-block .body {
+  font-size: 15px; color: var(--ink-2); line-height: 1.5; margin-bottom: 14px;
+}
+.rec-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.btn {
+  padding: 9px 18px; border-radius: 8px;
+  font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+  border: 1px solid transparent;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all .12s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #631c6a; }
+.btn-secondary { background: #fff; border-color: var(--line); color: var(--ink); }
+.btn-secondary:hover { border-color: var(--ink-3); }
+.btn-ghost { background: transparent; color: var(--accent); padding-left: 4px; }
+.btn-ghost:hover { text-decoration: underline; }
+.btn svg { font-size: var(--icon-sm); }
+
+/* Funnel mini */
+.mini-funnel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 16px;
+}
+.mini-funnel h5 {
+  margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--ink-2); font-weight: 600;
+}
+.fstep {
+  display: grid;
+  grid-template-columns: 90px 1fr 60px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.fstep .lbl { color: var(--ink-2); }
+.fstep .bar {
+  height: 10px; border-radius: 5px; background: var(--line-2);
+  overflow: hidden; position: relative;
+}
+.fstep .bar i {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  border-radius: 5px;
+}
+.fstep .num { font-weight: 700; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.fstep.problem .bar i { background: linear-gradient(90deg, #d88b8f, var(--bad)); }
+.fstep.problem .num { color: var(--bad); }
+
+/* Efficient frontier */
+.frontier-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 16px 18px 14px;
+}
+.frontier-card h4 {
+  margin: 0 0 4px; font-size: 16px; font-weight: 700;
+}
+.frontier-card .sub {
+  font-size: 14px; color: var(--ink-2); margin-bottom: 8px;
+}
+.frontier-card svg { width: 100%; height: 154px; }
+.frontier-card { width: auto; }
+.frontier-wrap { display: flex; flex-direction: column; gap: 4px; }
+.frontier-legend {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 11.5px; color: var(--ink-2);
+  margin-bottom: 6px;
+}
+.frontier-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.frontier-legend i { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+.frontier-callouts { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.fc-item { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--ink-2); line-height: 1.4; }
+.fc-item i { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.frontier-caption {
+  font-size: 11px; color: var(--accent); font-weight: 700;
+  text-align: center; margin-top: 6px;
+}
+.frontier-points {
+  margin: 12px 0 0; padding: 0 0 0 18px;
+  font-size: 14.5px; color: var(--ink-2); line-height: 1.6;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.frontier-points strong { color: var(--ink); font-weight: 700; }
+
+/* Info tooltip */
+.tip {
+  position: absolute;
+  background: #141018;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  max-width: 280px;
+  line-height: 1.4;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .12s, transform .12s;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.tip.show { opacity: 1; transform: translateY(0); }
+.tip::before {
+  content: ''; position: absolute; top: -5px; left: 14px;
+  border: 5px solid transparent; border-bottom-color: #141018; border-top: 0;
+}
+.tip strong { color: #e8cfed; font-weight: 600; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,8,14,0.55);
+  display: grid; place-items: center;
+  z-index: 100;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  width: 720px;
+  max-width: 92vw;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  padding: 36px 40px 32px;
+  transform: translateY(10px) scale(.98);
+  transition: transform .2s;
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal h2 {
+  margin: 0 0 6px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+  display: flex; align-items: center; gap: 8px;
+}
+.modal .sub { color: var(--ink-2); font-size: 15px; margin-bottom: 22px; }
+.goal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.goal-opt {
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; flex-direction: column; gap: 8px;
+  background: #fff;
+}
+.goal-opt:hover { border-color: #c9a4d1; background: var(--accent-softer); }
+.goal-opt.selected {
+  border-color: var(--accent);
+  background: var(--accent-softer);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.goal-opt .icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center;
+  font-size: var(--icon-md);
+}
+.goal-opt.selected .icon { background: var(--accent); color: #fff; }
+.goal-opt .nm { font-weight: 700; font-size: 17px; }
+.goal-opt .desc { font-size: 14px; color: var(--ink-2); line-height: 1.4; }
+.goal-opt .downstream {
+  margin-top: 4px;
+  font-size: 13px; color: var(--accent); font-weight: 500;
+  display: none;
+}
+.goal-opt.selected .downstream { display: block; }
+
+.modal-foot { display: flex; justify-content: space-between; align-items: center; }
+.modal-foot .hint { font-size: 14px; color: var(--ink-3); }
+
+/* Product launch milestones (gamification) */
+.launch-card {
+  background: linear-gradient(135deg, #1a0f1e 0%, #2b1830 100%);
+  border-radius: var(--radius-l);
+  padding: 22px 24px;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 28px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.launch-card::before {
+  content: ''; position: absolute;
+  right: -60px; top: -60px; width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(151,71,255,0.3), transparent 60%);
+}
+.launch-card h3 { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+.launch-card .launch-sub { font-size: 15px; color: #c9b8cc; line-height: 1.5; }
+.launch-progress {
+  height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;
+  margin-top: 14px; overflow: hidden;
+}
+.launch-progress i {
+  display: block; height: 100%; width: 60%;
+  background: linear-gradient(90deg, var(--accent-2), #d58df9);
+}
+.launch-progress-text {
+  font-size: 13px; color: #c9b8cc; margin-top: 6px;
+}
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+.milestone {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+  position: relative;
+  transition: all .2s;
+  cursor: pointer;
+}
+.milestone:hover { transform: translateY(-2px); border-color: rgba(151,71,255,0.4); }
+.milestone.done {
+  background: linear-gradient(180deg, rgba(151,71,255,0.22), rgba(151,71,255,0.08));
+  border-color: rgba(151,71,255,0.45);
+}
+.milestone .badge {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  margin: 0 auto 8px;
+  display: grid; place-items: center;
+  color: #c9b8cc;
+  font-size: var(--icon-md);
+  border: 2px solid transparent;
+}
+.milestone .tick svg { font-size: var(--icon-xs); }
+.launch-card > div:first-child > div:first-child svg { font-size: var(--icon-sm); }
+.milestone.done .badge {
+  background: linear-gradient(135deg, var(--accent-2), #d58df9);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 4px 14px rgba(151,71,255,0.4);
+}
+.milestone .title {
+  font-size: 14.5px; font-weight: 600; margin-bottom: 2px;
+}
+.milestone .cap {
+  font-size: 13px; color: #9a8aa0; line-height: 1.3;
+}
+.milestone.done .cap { color: #d5c5da; }
+.milestone .tick {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 13px; color: #b88ec2; display: none;
+}
+.milestone.done .tick { display: inline; }
+
+/* Section reveal helpers */
+.split-2 {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 18px;
+}
+
+/* Info panel floating */
+.info-panel {
+  position: absolute;
+  width: 320px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+  padding: 16px;
+  z-index: 60;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  display: none;
+}
+.info-panel.show { display: block; }
+.info-panel h5 {
+  margin: 0 0 6px; font-size: 15px; color: var(--ink); font-weight: 700;
+}
+.info-panel .factor {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-top: 1px solid var(--line-2);
+  font-size: 14px;
+}
+.info-panel .factor:first-of-type { border-top: none; }
+.info-panel .factor b { color: var(--ink); font-weight: 600; }
+.info-panel .factor .v { font-variant-numeric: tabular-nums; }
+.info-panel .factor .v.neg { color: var(--bad); }
+.info-panel .factor .v.pos { color: var(--good); }
+
+/* Misc */
+.badge-beta {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+  background: var(--accent); color: #fff;
+  padding: 2px 6px; border-radius: 4px;
+  font-weight: 700;
+}
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #141018; color: #fff;
+  padding: 12px 20px; border-radius: 10px;
+  font-size: 15px; font-weight: 500;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+  opacity: 0; pointer-events: none;
+  transition: all .25s;
+  z-index: 200;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast .tick-ico { color: #8be08f; font-size: var(--icon-sm); display: inline-flex; }
+
+/* Tweaks */
+.tweaks-btn {
+  position: fixed; right: 20px; bottom: 20px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 999px; padding: 10px 16px;
+  font-family: inherit; font-weight: 600; font-size: 15px;
+  cursor: pointer; box-shadow: 0 10px 28px rgba(120,43,127,0.4);
+  display: flex; gap: 6px; align-items: center;
+  z-index: 80;
+}
+
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+/* Campaign data */
+const CAMPAIGNS = [
+  {
+    id: "c1",
+    name: "CA_Signature_Velvet_Sofa_Collection",
+    sub: "Sponsored Products · 14 SKUs",
+    goal: "bestsellers",
+    active: true,
+    status: "bad",
+    insight: "Low bid for high RoAS",
+    insightType: "bad",
+    roas: 412, roasDelta: 28, roasGood: true,
+    spend: 1240, ctr: 1.9, revenue: 5113, revenueDelta: 19,
+    attrSpend: 1090,
+    currentBid: 0.45, suggestedBid: 1.10,
+    budgetCap: 50, impressions: 48200,
+    rec: {
+      kind: "bid-roas",
+      title: "Increase bid — high RoAS suggests headroom",
+      body: "RoAS is 412%, well above the portfolio median. That's usually a sign that your bid is too conservative. Raising bid from $0.45 to $1.10 projects +212% sales volume at ~260% RoAS — still efficient, but much higher absolute revenue.",
+    }
+  },
+  {
+    id: "c2",
+    name: "CA_Signature_Oakwood_Bedframe_Queen",
+    sub: "Sponsored Products · 6 SKUs",
+    goal: "bestsellers",
+    active: true,
+    status: "good",
+    insight: "Performing within target",
+    insightType: "good",
+    roas: 248, roasDelta: 4, roasGood: true,
+    spend: 2180, ctr: 2.4, revenue: 5410, revenueDelta: 6,
+    attrSpend: 1962,
+    currentBid: 0.82, suggestedBid: null,
+    budgetCap: 120, impressions: 91000,
+    rec: null,
+  },
+  {
+    id: "c3",
+    name: "NewLaunch_Arcadia_Dining_Set_2026",
+    sub: "New Product Launch · 3 SKUs",
+    goal: "launch",
+    active: true,
+    status: "warn",
+    insight: "Low click-through rate",
+    insightType: "warn",
+    roas: 118, roasDelta: -12, roasGood: false,
+    spend: 860, ctr: 0.6, revenue: 1014, revenueDelta: -8,
+    attrSpend: 712,
+    currentBid: 0.62, suggestedBid: null,
+    budgetCap: 80, impressions: 143000,
+    rec: {
+      kind: "funnel-ctr",
+      title: "Click-through is the bottleneck",
+      body: "Impressions are healthy but CTR is 0.6% — far below the 1.8% benchmark for launch campaigns. This is a creative/listing issue, not a bid issue. Improving thumbnail and title could lift CTR 2–3×.",
+    }
+  },
+  {
+    id: "c4",
+    name: "Clearance_Warehouse_Rugs_Q2",
+    sub: "Faster Inv. Turnover · 42 SKUs",
+    goal: "inventory",
+    active: false,
+    status: "bad",
+    insight: "Insufficient budget cap",
+    insightType: "bad",
+    roas: 196, roasDelta: 8, roasGood: true,
+    spend: 1980, ctr: 2.1, revenue: 3880, revenueDelta: 11,
+    attrSpend: 1742,
+    currentBid: 0.71, suggestedBid: 0.71,
+    budgetCap: 100, impressions: 72000,
+    rec: {
+      kind: "budget",
+      title: "Daily budget is capping performance",
+      body: "Your campaign hits its daily budget by 2pm on average. In the remaining 10 hours it misses an estimated 38% of qualified impressions. Raising cap from $100 → $165 should unlock the ceiling.",
+    }
+  },
+  {
+    id: "c5",
+    name: "CA_Signature_Mid-Century_Accent_Chair",
+    sub: "Sponsored Products · 8 SKUs",
+    goal: "bestsellers",
+    active: true,
+    status: "warn",
+    insight: "RoAS declining 3 weeks",
+    insightType: "warn",
+    roas: 184, roasDelta: -18, roasGood: false,
+    spend: 1610, ctr: 2.0, revenue: 2960, revenueDelta: -14,
+    attrSpend: 1418,
+    currentBid: 0.88, suggestedBid: 0.72,
+    budgetCap: 90, impressions: 66000,
+    rec: null,
+  },
+  {
+    id: "c6",
+    name: "NewLaunch_Bentwood_Coffee_Table",
+    sub: "New Product Launch · 2 SKUs",
+    goal: "launch",
+    active: true,
+    status: "good",
+    insight: "Strong launch performance",
+    insightType: "good",
+    roas: 214, roasDelta: 22, roasGood: true,
+    spend: 940, ctr: 2.8, revenue: 2012, revenueDelta: 24,
+    attrSpend: 836,
+    currentBid: 0.68, suggestedBid: null,
+    budgetCap: 75, impressions: 52000,
+    rec: null,
+  },
+  {
+    id: "c7",
+    name: "Clearance_Last_Season_Outdoor",
+    sub: "Faster Inv. Turnover · 24 SKUs",
+    goal: "inventory",
+    active: false,
+    status: "good",
+    insight: "On track to clear by June 12",
+    insightType: "good",
+    roas: 156, roasDelta: 3, roasGood: true,
+    spend: 1720, ctr: 2.2, revenue: 2683, revenueDelta: 5,
+    attrSpend: 1531,
+    currentBid: 0.66, suggestedBid: null,
+    budgetCap: 95, impressions: 58000,
+    rec: null,
+  },
+];
+
+const GOALS = [
+  { id: "all", label: "All Campaigns", count: 7, icon: "Crown" },
+  { id: "bestsellers", label: "Boost Bestsellers", count: 3, icon: "Crown" },
+  { id: "launch", label: "New Product Launch", count: 2, icon: "Rocket" },
+  { id: "inventory", label: "Faster Inv. Turnover", count: 2, icon: "Inventory" },
+  { id: "standard", label: "Standard", count: 0, icon: "Target" },
+];
+
+const GOAL_KPIS = {
+  all: [
+    {label: "Ad Spend", val: "$10,530", delta: 8, unit: "%", help: "Total ad dollars spent over the selected window."},
+    {label: "RoAS", val: "198%", delta: 6, unit: "%", help: "Return on ad spend. Revenue from ads ÷ ad spend."},
+    {label: "Revenue", val: "$23,072", delta: 12, unit: "%", help: "Attributed revenue from ad-driven clicks."},
+    {label: "Cost per Click", val: "$0.79", delta: -3, unit: "%", help: "Average cost paid per click."},
+    {label: "Conversion Rate", val: "3.1%", delta: 2, unit: "%", help: "% of clicks that ended in purchase."},
+  ],
+  bestsellers: [
+    {label: "Bestseller Rank Change", val: "+2.4 avg", delta: 14, unit: "%", help: "Average rank movement of promoted SKUs vs. last period. Primary goal metric."},
+    {label: "Units Sold", val: "1,412", delta: 18, unit: "%"},
+    {label: "RoAS", val: "248%", delta: 6, unit: "%"},
+    {label: "Ad Spend", val: "$5,030", delta: 5, unit: "%"},
+    {label: "Share of Voice", val: "11.8%", delta: 1.2, unit: "pp"},
+  ],
+  launch: [
+    {label: "New Product Visibility", val: "68%", delta: 22, unit: "%", help: "Share of target customers who saw the product at least once. Primary goal metric."},
+    {label: "Review Volume", val: "47", delta: 11, unit: "", help: "Reviews received on launched SKUs."},
+    {label: "First-Time Buyers", val: "214", delta: 28, unit: "%"},
+    {label: "CTR", val: "1.7%", delta: -8, unit: "%"},
+    {label: "Ad Spend", val: "$1,800", delta: 3, unit: "%"},
+  ],
+  inventory: [
+    {label: "Sell-Through Rate", val: "62%", delta: 9, unit: "pp", help: "% of targeted inventory sold. Primary goal metric."},
+    {label: "Days of Supply Left", val: "41", delta: -24, unit: "%"},
+    {label: "Units Sold", val: "980", delta: 14, unit: "%"},
+    {label: "RoAS", val: "176%", delta: 4, unit: "%"},
+    {label: "Ad Spend", val: "$3,700", delta: 11, unit: "%"},
+  ],
+};
+
+window.CAMPAIGNS = CAMPAIGNS;
+window.GOALS = GOALS;
+window.GOAL_KPIS = GOAL_KPIS;
+
+</script>
+<script type="text/babel">
+/* global React */
+const { useState, useRef, useEffect } = React;
+
+// All icons render at 1em — the consuming container sets font-size
+// via the --icon-size CSS var for consistent sizing across the app.
+const S = { width: "1em", height: "1em", flex: "0 0 auto" };
+
+const Icon = {
+  Search: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>,
+  ChevronRight: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>,
+  ChevronDown: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>,
+  Home: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12 12 3l9 9" /><path d="M5 10v10h14V10" /></svg>,
+  Megaphone: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11v2a2 2 0 0 0 2 2h2l8 5V4L7 9H5a2 2 0 0 0-2 2z" /><path d="M18 8a4 4 0 0 1 0 8" /></svg>,
+  Chart: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="M7 14l3-3 4 4 6-6" /></svg>,
+  Box: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><path d="M3.3 7 12 12l8.7-5" /><path d="M12 22V12" /></svg>,
+  Wallet: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1" /><path d="M16 12h6v4h-6z" /></svg>,
+  Gear: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>,
+  Sparkle: () => <svg style={S} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z" /></svg>,
+  Target: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>,
+  Rocket: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" /><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" /></svg>,
+  Crown: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8l3 9h14l3-9-5 3-5-7-5 7-5-3z" /><path d="M5 17h14" /></svg>,
+  Inventory: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="4" rx="1" /><path d="M5 8v12h14V8" /><path d="M10 12h4" /></svg>,
+  Bolt: () => <svg style={S} viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" /></svg>,
+  Info: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></svg>,
+  Check: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>,
+  Alert: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4M12 17h.01" /><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /></svg>,
+  Dash: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14" /></svg>,
+  Arrow: ({ dir = "up" }) => <svg style={{ ...S, transform: dir === "down" ? "rotate(180deg)" : "" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>,
+  Camera: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>,
+  Tag: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><circle cx="7" cy="7" r="1.5" fill="currentColor" /></svg>,
+  Star: () => <svg style={S} viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>,
+  Pencil: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>,
+  X: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>,
+  Plus: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>,
+  // Sidebar icons matching the attached reference image
+  Hamburger: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>,
+  // 1. Bar chart — three vertical bars, mid taller
+  Bars: () => <svg style={{ ...S, strokeWidth: "1.9px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3.5" y="10" width="4.5" height="10" rx="0.5" /><rect x="9.75" y="4" width="4.5" height="16" rx="0.5" /><rect x="16" y="13" width="4.5" height="7" rx="0.5" /></svg>,
+  // 2. Ticket / coupon — rotated rounded rectangle with two side notches
+  Diamond: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 3.5 20.5 9.5a2 2 0 0 1 0 2.83l-8.17 8.17a2 2 0 0 1-2.83 0L3.5 14.5a2 2 0 0 1 0-2.83l8.17-8.17a2 2 0 0 1 2.83 0z" /><path d="m9 9 1.5 1.5M14 14l1.5 1.5" /></svg>,
+  // 3. Lock — padlock with shackle
+  Lock: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="1.5" /><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" /></svg>,
+  // 4. Boxes / tree — one box on top, two below connected by lines
+  Grid4: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="6" rx="0.5" /><rect x="3" y="15" width="6" height="6" rx="0.5" /><rect x="15" y="15" width="6" height="6" rx="0.5" /><path d="M12 9v3M6 15v-3h12v3" /></svg>,
+  // 5. Storefront — awning roof, door, two windows
+  Storefront: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8h18l-1.5-3.5h-15z" /><path d="M4 8v12h16V8" /><path d="M6.5 11h2M11 11h2M15.5 11h2" /><rect x="10" y="14" width="4" height="6" /></svg>,
+  // 6. Price tag — rotated tag with hole
+  TagSimple: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.5 12.5 12.5 20.5a2 2 0 0 1-2.83 0L3.5 14.33a2 2 0 0 1 0-2.83L11.5 3.5h7.83a1.17 1.17 0 0 1 1.17 1.17z" /><circle cx="15" cy="9" r="1.4" /></svg>,
+  // 7. Laptop with code brackets <>
+  Monitor: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="5" width="15" height="11" rx="1" /><path d="M2.5 19.5h19" /><path d="m10.5 9.5-2 2 2 2M13.5 9.5l2 2-2 2" /></svg>,
+  // 8. Quatrefoil / clover — four overlapping circles in a flower shape
+  HexGrid: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="6.5" r="3.5" /><circle cx="12" cy="17.5" r="3.5" /><circle cx="6.5" cy="12" r="3.5" /><circle cx="17.5" cy="12" r="3.5" /></svg>,
+  // 9. Document with lines
+  Document: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 5.5 19 4v17H5z" /><path d="M5 8h14M9 13h6M9 16.5h4" /></svg>,
+  // 10. Document with download arrow
+  Inbox: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5" /><path d="M12 12v5M9.5 14.5 12 17l2.5-2.5" /></svg>,
+  Help: () => <svg style={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01" /></svg>
+};
+
+window.Icon = Icon;
+</script>
+<script type="text/babel">
+
+// tweaks-panel.jsx
+// Reusable Tweaks shell + form-control helpers.
+//
+// Owns the host protocol (listens for __activate_edit_mode / __deactivate_edit_mode,
+// posts __edit_mode_available / __edit_mode_set_keys / __edit_mode_dismissed) so
+// individual prototypes don't re-roll it. Ships a consistent set of controls so you
+// don't hand-draw <input type="range">, segmented radios, steppers, etc.
+//
+// Usage (in an HTML file that loads React + Babel):
+//
+//   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+//     "primaryColor": "#D97757",
+//     "fontSize": 16,
+//     "density": "regular",
+//     "dark": false
+//   }/*EDITMODE-END*/;
+//
+//   function App() {
+//     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+//     return (
+//       <div style={{ fontSize: t.fontSize, color: t.primaryColor }}>
+//         Hello
+//         <TweaksPanel>
+//           <TweakSection label="Typography" />
+//           <TweakSlider label="Font size" value={t.fontSize} min={10} max={32} unit="px"
+//                        onChange={(v) => setTweak('fontSize', v)} />
+//           <TweakRadio  label="Density" value={t.density}
+//                        options={['compact', 'regular', 'comfy']}
+//                        onChange={(v) => setTweak('density', v)} />
+//           <TweakSection label="Theme" />
+//           <TweakColor  label="Primary" value={t.primaryColor}
+//                        onChange={(v) => setTweak('primaryColor', v)} />
+//           <TweakToggle label="Dark mode" value={t.dark}
+//                        onChange={(v) => setTweak('dark', v)} />
+//         </TweaksPanel>
+//       </div>
+//     );
+//   }
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size: 14px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size: 15px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+
+  .twk-sect{font-size: 12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+
+  .twk-field{appearance:none;width:100%;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;height:22px;
+    border-radius:6px;cursor:default;padding:0}
+
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+
+  .twk-num{display:flex;align-items:center;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+`;
+
+// ── useTweaks ───────────────────────────────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists via the host
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((key, val) => {
+    setValues((prev) => ({ ...prev, [key]: val }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*');
+  }, []);
+  return [values, setTweak];
+}
+
+// ── TweaksPanel ─────────────────────────────────────────────────────────────
+// Floating shell. Registers the protocol listener BEFORE announcing
+// availability — if the announce ran first, the host's activate could land
+// before our handler exists and the toolbar toggle would silently no-op.
+// The close button posts __edit_mode_dismissed so the host's toolbar toggle
+// flips off in lockstep; the host echoes __deactivate_edit_mode back which
+// is what actually hides the panel.
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel"
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+// ── Layout helpers ──────────────────────────────────────────────────────────
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Controls ────────────────────────────────────────────────────────────────
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              role="switch" aria-checked={!!value}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  // The active value is read by pointer-move handlers attached for the lifetime
+  // of a drag — ref it so a stale closure doesn't fire onChange for every move.
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakText({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+             onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  const clamp = (n) => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({ x: 0, val: 0 });
+  const onScrubStart = (e) => {
+    e.preventDefault();
+    startRef.current = { x: e.clientX, val: value };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = (ev) => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return (
+    <div className="twk-num">
+      <span className="twk-num-lbl" onPointerDown={onScrubStart}>{label}</span>
+      <input type="number" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(clamp(Number(e.target.value)))} />
+      {unit && <span className="twk-num-unit">{unit}</span>}
+    </div>
+  );
+}
+
+function TweakColor({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <input type="color" className="twk-swatch" value={value}
+             onChange={(e) => onChange(e.target.value)} />
+    </div>
+  );
+}
+
+function TweakButton({ label, onClick, secondary = false }) {
+  return (
+    <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'}
+            onClick={onClick}>{label}</button>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakSlider, TweakToggle, TweakRadio, TweakSelect,
+  TweakText, TweakNumber, TweakColor, TweakButton,
+});
+
+</script>
+<script type="text/babel">
+/* global React, Icon */
+const { useState } = React;
+
+function GoalModal({ open, onSelect, onClose, initial }) {
+  const [picked, setPicked] = useState(initial || "bestsellers");
+
+  const opts = [
+  { id: "bestsellers", Ic: Icon.Crown, nm: "Boost Bestsellers",
+    desc: "Promote products that are already performing well to amplify sales velocity.",
+    down: "→ Analytics optimize for rank change, SoV, and units sold." },
+  { id: "launch", Ic: Icon.Rocket, nm: "New Product Launch",
+    desc: "Drive first-time visibility and review volume for a recently introduced product.",
+    down: "→ Analytics optimize for new-buyer reach, CTR, and review growth." },
+  { id: "inventory", Ic: Icon.Inventory, nm: "Faster Inventory Turnover",
+    desc: "Clear aging stock or seasonal inventory before it depreciates.",
+    down: "→ Analytics optimize for sell-through rate and days of supply left." },
+  { id: "standard", Ic: Icon.Target, nm: "Standard Campaign",
+    desc: "A general-purpose campaign with no specific goal optimization applied.",
+    down: "→ Analytics show the classic generic metrics view." }];
+
+
+  return (
+    <div className={`modal-overlay ${open ? "open" : ""}`} onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: "780px" }}>
+        <h2>Your Goals <span style={{ fontSize: 14, fontWeight: 500, color: "var(--ink-3)" }}>Step 1 of 4</span></h2>
+        <div className="sub">What should this campaign achieve? Your choice tailors the dashboard, success criteria, and recommendations.</div>
+        <div className="goal-grid">
+          {opts.map((o) =>
+          <div key={o.id} className={`goal-opt ${picked === o.id ? "selected" : ""}`} onClick={() => setPicked(o.id)}>
+              <div className="icon"><o.Ic /></div>
+              <div className="nm">{o.nm}</div>
+              <div className="desc">{o.desc}</div>
+              <div className="downstream">{o.down}</div>
+            </div>
+          )}
+        </div>
+        <div className="modal-foot">
+          <span className="hint">You can change this later from campaign settings.</span>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+            <button className="btn btn-primary">
+              Continue <Icon.ChevronRight />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>);
+
+}
+window.GoalModal = GoalModal;
+</script>
+<script type="text/babel">
+/* global React */
+const { useRef: useRefC, useEffect: useEffectC, useState: useStateC } = React;
+
+function SpendChart({ highlightDip }) {
+  const days = ["6/01","6/03","6/05","6/07","6/09","6/11","6/13","6/15","6/17","6/19","6/21","6/23","6/25","6/27","6/29","7/01"];
+  const spend   = [380, 420, 460, 510, 540, 590, 620, 650, 710, 740, 790, 820, 840, 860, 520, 460];
+  const imprs   = [18, 22, 26, 30, 32, 36, 41, 44, 48, 52, 57, 61, 63, 65, 38, 30];
+
+  const W = 960, H = 280, padL = 44, padR = 24, padT = 16, padB = 34;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const xs = days.map((_,i) => padL + (i/(days.length-1)) * chartW);
+  const maxS = 1000, maxI = 70;
+  const ysSpend = spend.map(v => padT + chartH - (v/maxS)*chartH);
+  const ysImpr = imprs.map(v => padT + chartH - (v/maxI)*chartH);
+
+  const line = (pts) => pts.map((p,i)=> (i?"L":"M")+p[0]+","+p[1]).join(" ");
+  const area = (pts) => line(pts) + ` L ${pts[pts.length-1][0]} ${padT+chartH} L ${pts[0][0]} ${padT+chartH} Z`;
+
+  const spendPts = xs.map((x,i)=>[x, ysSpend[i]]);
+  const imprPts = xs.map((x,i)=>[x, ysImpr[i]]);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="280">
+      <defs>
+        <linearGradient id="gradSpend" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#782b7f" stopOpacity="0.25"/>
+          <stop offset="100%" stopColor="#782b7f" stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      {[0,0.25,0.5,0.75,1].map((t,i)=>(
+        <g key={i}>
+          <line x1={padL} x2={W-padR} y1={padT+chartH*(1-t)} y2={padT+chartH*(1-t)} stroke="#f1eff3" />
+          <text x={padL-8} y={padT+chartH*(1-t)+4} fontSize="10" fill="#8a8690" textAnchor="end">
+            ${Math.round(maxS*t)}
+          </text>
+        </g>
+      ))}
+      {highlightDip && (
+        <g>
+          <rect x={xs[13]-10} y={padT} width={xs[15]-xs[13]+20} height={chartH}
+            fill="rgba(197,69,73,0.08)" stroke="#c54549" strokeDasharray="3 3" rx="4" />
+          <text x={xs[14]} y={padT+14} fontSize="10" fill="#c54549" textAnchor="middle" fontWeight="600">
+            Budget cap hit
+          </text>
+        </g>
+      )}
+      <path d={area(spendPts)} fill="url(#gradSpend)" />
+      <path d={line(spendPts)} fill="none" stroke="#782b7f" strokeWidth="2" />
+      <path d={line(imprPts)} fill="none" stroke="#a59726" strokeWidth="1.6" strokeDasharray="4 3" />
+      {xs.map((x,i)=>(
+        <g key={i}>
+          <circle cx={x} cy={ysSpend[i]} r="3" fill="#fff" stroke="#782b7f" strokeWidth="1.6" />
+          {i%2===0 && <text x={x} y={H-12} fontSize="10" fill="#8a8690" textAnchor="middle">{days[i]}</text>}
+        </g>
+      ))}
+    </svg>
+  );
+}
+window.SpendChart = SpendChart;
+
+</script>
+<script type="text/babel">
+/* global React */
+const { useState: useStateF } = React;
+
+function EfficientFrontier() {
+  const W = 460, H = 300, pad = 54, plotR = W - 20, plotT = 40, plotB = H - 62;
+  const p0=[pad,plotT+10], p1=[pad+(plotR-pad)*0.62,plotT+6], p2=[pad+(plotR-pad)*0.38,plotB+10], p3=[plotR-8,plotB+14];
+  const curve = `M${p0[0]},${p0[1]} C${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]}`;
+  const bez=(a,b,c,d,t)=>{const mt=1-t;return [mt*mt*mt*a[0]+3*mt*mt*t*b[0]+3*mt*t*t*c[0]+t*t*t*d[0], mt*mt*mt*a[1]+3*mt*mt*t*b[1]+3*mt*t*t*c[1]+t*t*t*d[1]];};
+  // Current campaign: high RoAS, low volume — sits early on the frontier, above the target range
+  const [curX,curY] = bez(p0,p1,p2,p3,0.16);
+  const bandY0 = (plotT+plotB)/2 - 18, bandY1 = (plotT+plotB)/2 + 18;
+
+  return (
+    <div className="frontier-wrap">
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="210">
+        <line x1={pad} y1={plotB+14} x2={pad} y2={plotT-6} stroke="#2b2830" strokeWidth="2"/>
+        <line x1={pad} y1={plotB+14} x2={plotR} y2={plotB+14} stroke="#2b2830" strokeWidth="2"/>
+        <path d={`M${pad-5},${plotT+2} L${pad+5},${plotT+2} L${pad},${plotT-8} Z`} fill="#2b2830"/>
+        <path d={`M${plotR-9},${plotB+9} L${plotR-9},${plotB+19} L${plotR+1},${plotB+14} Z`} fill="#2b2830"/>
+        <line x1={pad} y1={bandY0} x2={plotR} y2={bandY0} stroke="#4c9a4c" strokeWidth="2" strokeDasharray="6 4"/>
+        <line x1={pad} y1={bandY1} x2={plotR} y2={bandY1} stroke="#4c9a4c" strokeWidth="2" strokeDasharray="6 4"/>
+        <path d={curve} fill="none" stroke="#782b7f" strokeWidth="3"/>
+        <circle cx={curX} cy={curY} r="7" fill="#782b7f" stroke="#fff" strokeWidth="2.5"/>
+        <text x={16} y={(plotT+plotB)/2 - 10} fontSize="16" fill="#1a1a1a" fontWeight="800" textAnchor="middle" transform={`rotate(-90 16 ${(plotT+plotB)/2 - 10})`}>RoAS</text>
+        <text x={(pad+plotR)/2} y={H-6} fontSize="16" fill="#1a1a1a" fontWeight="800" textAnchor="middle">Sale Volume</text>
+        <text x={pad-6} y={plotT+8} fontSize="16" fill="#5b5560" textAnchor="end">High</text>
+        <text x={pad-6} y={plotB+8} fontSize="16" fill="#5b5560" textAnchor="end">Low</text>
+        <text x={pad+4} y={plotB+34} fontSize="16" fill="#5b5560" textAnchor="start">Low</text>
+        <text x={plotR-4} y={plotB+34} fontSize="16" fill="#5b5560" textAnchor="end">High</text>
+        <g transform={`translate(${pad+10},14)`}>
+          <line x1="0" y1="4" x2="22" y2="4" stroke="#782b7f" strokeWidth="3"/>
+          <text x="28" y="8" fontSize="16" fill="#2b2830" fontWeight="600">Efficient Frontier</text>
+          <line x1="150" y1="4" x2="172" y2="4" stroke="#4c9a4c" strokeWidth="2" strokeDasharray="5 4"/>
+          <text x="178" y="8" fontSize="16" fill="#2b2830" fontWeight="600">Target ROAS Range</text>
+        </g>
+      </svg>
+      <div className="frontier-callouts">
+        <div className="fc-item"><i style={{background:"#782b7f"}}/><div><strong style={{color:"var(--accent)"}}>This campaign</strong> — 850% RoAS, low volume: too efficient, likely underbidding</div></div>
+      </div>
+      <div className="frontier-caption">
+        Shown only when the recommendation is a low bid caused by high RoAS
+      </div>
+    </div>
+  );
+}
+window.EfficientFrontier = EfficientFrontier;
+
+</script>
+<script type="text/babel">
+/* global React, Icon, CAMPAIGNS, EfficientFrontier */
+const { useState: useStateT } = React;
+
+function StatusPill({ s }) {
+  const map = { good:{c:"good", t:"Healthy"}, warn:{c:"warn",t:"Attention"}, bad:{c:"bad",t:"Needs Action"} };
+  const v = map[s];
+  return <span className={`status-pill ${v.c}`}><span className="d"/>{v.t}</span>;
+}
+
+function DeltaPill({v, unit="%"}) {
+  const cls = v > 0 ? "up" : v < 0 ? "down" : "flat";
+  const sign = v > 0 ? "+" : "";
+  const I = v > 0 ? Icon.Arrow : v < 0 ? () => <Icon.Arrow dir="down"/> : Icon.Dash;
+  return <span className={`k-delta ${cls}`}><I/>{sign}{v}{unit}</span>;
+}
+
+function RecBlock({rec, campaign, onChange}) {
+  if (rec.kind === "bid-roas") {
+    return (
+      <div className="drawer">
+        <div className="rec-block">
+          <h4>Recommendation</h4>
+          <div className="title">{rec.title}</div>
+          <div className="body">{rec.body}</div>
+          <div style={{display:"flex",alignItems:"center",gap:16,background:"#fff",padding:"12px 14px",borderRadius:10,border:"1px solid var(--line)",marginBottom:14}}>
+            <div>
+              <div style={{fontSize:11,color:"var(--ink-3)",textTransform:"uppercase",letterSpacing:".08em",fontWeight:600}}>Current bid</div>
+              <div style={{fontSize:20,fontWeight:700}}>${campaign.currentBid.toFixed(2)}</div>
+            </div>
+            <div style={{fontSize:20,color:"var(--accent)"}}>→</div>
+            <div>
+              <div style={{fontSize:11,color:"var(--accent)",textTransform:"uppercase",letterSpacing:".08em",fontWeight:600}}>Suggested bid</div>
+              <div style={{fontSize:20,fontWeight:700,color:"var(--accent)"}}>${campaign.suggestedBid.toFixed(2)}</div>
+            </div>
+            <div style={{flex:1,textAlign:"right",fontSize:12,color:"var(--ink-2)"}}>
+              <div>Projected revenue lift: <b style={{color:"var(--good)"}}>+$10,800/mo</b></div>
+              <div>Projected RoAS: <b>~260%</b> (still efficient)</div>
+            </div>
+          </div>
+          <div className="rec-actions">
+            <button className="btn btn-primary" onClick={onChange}>Apply bid change</button>
+            <button className="btn btn-secondary">Customize bid</button>
+            <button className="btn btn-ghost">Dismiss recommendation</button>
+          </div>
+        </div>
+        <div className="frontier-card">
+          <h4>Explaining when a "good" metric is actually a problem</h4>
+          <div className="sub" style={{fontWeight:700,color:"var(--accent)",fontSize:15,marginBottom:10}}>RoAS Efficient Frontier</div>
+          <div style={{fontSize:15,color:"var(--ink-2)",lineHeight:1.55,marginBottom:14}}>
+            A very high RoAS can mean a campaign is <strong style={{color:"var(--ink)"}}>underbidding</strong> and leaving reach on the table — not that it's performing optimally.
+          </div>
+          <EfficientFrontier />
+          <ul className="frontier-points">
+            <li><strong>Efficiency vs. volume:</strong> RoAS alone shouldn't be maximized — it's a tradeoff against sales volume.</li>
+            <li><strong>Too conservative:</strong> an overly cautious bid preserves efficiency but suppresses growth.</li>
+            <li><strong>Why this matters:</strong> raising bid can unlock more demand without pushing the campaign out of the efficient range.</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+  if (rec.kind === "funnel-ctr") {
+    const funnel = [
+      {lbl:"Impressions", n:"143,000", pct: 100, problem:false},
+      {lbl:"Click-through", n:"858", pct: 0.6*30, problem:true},
+      {lbl:"Add to cart", n:"104", pct: 8, problem:false},
+      {lbl:"Purchase", n:"42", pct: 4, problem:false},
+    ];
+    return (
+      <div className="drawer">
+        <div className="rec-block">
+          <h4>Root-cause diagnosis</h4>
+          <div className="title">{rec.title}</div>
+          <div className="body">{rec.body}</div>
+          <div className="mini-funnel">
+            <h5>Product conversion funnel — where it's breaking</h5>
+            {funnel.map((f,i)=>(
+              <div key={i} className={`fstep ${f.problem?"problem":""}`}>
+                <div className="lbl">{f.lbl}</div>
+                <div className="bar"><i style={{width: Math.max(f.pct, 4) + "%"}}/></div>
+                <div className="num">{f.n}</div>
+              </div>
+            ))}
+            <div style={{fontSize:11,color:"var(--ink-3)",marginTop:8,display:"flex",gap:16,flexWrap:"wrap"}}>
+              <span style={{color:"var(--bad)",fontWeight:600}}>● Actionable drop-off</span>
+              <span>CTR is below benchmark — likely a creative / listing issue.</span>
+            </div>
+          </div>
+          <div className="rec-actions" style={{marginTop:14}}>
+            <button className="btn btn-primary">Review listing quality</button>
+            <button className="btn btn-secondary">Request creative refresh</button>
+            <button className="btn btn-ghost">Dismiss</button>
+          </div>
+        </div>
+        <div className="frontier-card">
+          <h4>What the ad system can't fix</h4>
+          <div className="sub">Separating ad problems from product problems.</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8,fontSize:12}}>
+            <div style={{padding:"10px 12px",background:"#f4e9f6",borderRadius:8,borderLeft:"3px solid var(--accent)"}}>
+              <b>We can influence:</b> Impressions, CTR via bid & targeting.
+            </div>
+            <div style={{padding:"10px 12px",background:"#fbf4fd",borderRadius:8,borderLeft:"3px solid var(--accent-2)"}}>
+              <b>Creative team can influence:</b> Thumbnail, title, copy → CTR quality.
+            </div>
+            <div style={{padding:"10px 12px",background:"#f3dede",borderRadius:8,borderLeft:"3px solid var(--bad)"}}>
+              <b>Out of ad scope:</b> Add-to-cart rate, checkout friction, pricing.
+            </div>
+          </div>
+          <div style={{fontSize:11,color:"var(--ink-3)",marginTop:10,lineHeight:1.4}}>
+            We only flag issues the ad engine can realistically improve.
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // budget
+  return (
+    <div className="drawer">
+      <div className="rec-block">
+        <h4>Recommendation</h4>
+        <div className="title">{rec.title}</div>
+        <div className="body">{rec.body}</div>
+        <div style={{display:"flex",alignItems:"center",gap:16,background:"#fff",padding:"12px 14px",borderRadius:10,border:"1px solid var(--line)",marginBottom:14}}>
+          <div>
+            <div style={{fontSize:11,color:"var(--ink-3)",textTransform:"uppercase",letterSpacing:".08em",fontWeight:600}}>Current daily cap</div>
+            <div style={{fontSize:20,fontWeight:700}}>${campaign.budgetCap}</div>
+          </div>
+          <div style={{fontSize:20,color:"var(--accent)"}}>→</div>
+          <div>
+            <div style={{fontSize:11,color:"var(--accent)",textTransform:"uppercase",letterSpacing:".08em",fontWeight:600}}>Suggested cap</div>
+            <div style={{fontSize:20,fontWeight:700,color:"var(--accent)"}}>$165</div>
+          </div>
+          <div style={{flex:1,textAlign:"right",fontSize:12,color:"var(--ink-2)"}}>
+            <div>Unlocked impressions: <b style={{color:"var(--good)"}}>+38%</b></div>
+            <div>Projected sell-through: <b>78%</b> by target date</div>
+          </div>
+        </div>
+        <div className="rec-actions">
+          <button className="btn btn-primary" onClick={onChange}>Raise daily budget</button>
+          <button className="btn btn-secondary">Schedule budget</button>
+          <button className="btn btn-ghost">Dismiss</button>
+        </div>
+      </div>
+      <div className="frontier-card">
+        <h4>Prioritization</h4>
+        <div className="sub">Why budget is the top lever here.</div>
+        <div style={{display:"flex",flexDirection:"column",gap:8,fontSize:12}}>
+          {[
+            {nm:"Raise daily budget cap", eff:"High", ef:"Low", act:true},
+            {nm:"Increase bid per click", eff:"Med", ef:"Low"},
+            {nm:"Expand targeting keywords", eff:"Med", ef:"Med"},
+            {nm:"Refresh creative", eff:"Low", ef:"High"},
+          ].map((r,i)=>(
+            <div key={i} style={{display:"grid",gridTemplateColumns:"1fr 50px 50px",gap:8,padding:"8px 10px",borderRadius:6,
+              background: r.act?"#f4e9f6":"#fafafc",
+              border: r.act?"1px solid #d8bbde":"1px solid transparent"}}>
+              <div style={{fontWeight: r.act?700:500, color: r.act?"var(--accent)":"var(--ink)"}}>{r.nm}</div>
+              <div style={{fontSize:11,color:"var(--ink-2)",textAlign:"center"}}>
+                <div style={{fontSize:9,color:"var(--ink-3)"}}>Impact</div>{r.eff}
+              </div>
+              <div style={{fontSize:11,color:"var(--ink-2)",textAlign:"center"}}>
+                <div style={{fontSize:9,color:"var(--ink-3)"}}>Effort</div>{r.ef}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getProductRowsRaw(campaign) {
+  const skuMatch = (campaign.sub || "").match(/(\d+)\s*SKU/i);
+  const skuCount = skuMatch ? Math.min(parseInt(skuMatch[1], 10), 8) : 4;
+  const pools = {
+    "c1": ["Velvet Sloan 3-Seat Sofa","Velvet Mira Loveseat","Velvet Pierce Sectional","Velvet Astor Chaise","Velvet Halston Bench","Velvet Ridge Ottoman","Velvet Ellis Armchair","Velvet Cleo Settee"],
+    "c2": ["Oakwood Queen Platform","Oakwood Queen Storage","Oakwood Queen Canopy","Oakwood Queen Slat","Oakwood Headboard Set","Oakwood Footboard Add-on"],
+    "c3": ["Arcadia Dining Table 72\"","Arcadia Dining Bench","Arcadia Side Chair (set/4)"],
+    "c4": ["Heritage Wool Rug 8x10","Coastal Jute 6x9","Persian Loom 5x8","Shag Cloud 9x12","Outdoor Weave 4x6","Vintage Kilim 8x10","Modern Geometric 6x9","Soft Touch Plush 5x7"],
+    "c5": ["Mid-Century Walnut Chair","Mid-Century Velvet Tufted","Mid-Century Boucle","Mid-Century Leather","Mid-Century Linen","Mid-Century Curved Arm","Mid-Century Swivel","Mid-Century Lounger"],
+    "c6": ["Bentwood Round Coffee Table","Bentwood Oval Coffee Table"],
+    "c7": ["Outdoor Sectional 5pc","Outdoor Dining Set 7pc","Outdoor Loveseat","Outdoor Lounger","Outdoor Side Table","Outdoor Umbrella","Outdoor Cushion Pack","Outdoor Fire Pit"],
+  };
+  const names = pools[campaign.id] || Array.from({length: skuCount}, (_,i) => `SKU #${i+1}`);
+  const products = names.slice(0, skuCount);
+  let seed = campaign.id.charCodeAt(1) * 7;
+  const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const weights = products.map(() => 0.4 + rand());
+  const wSum = weights.reduce((a,b) => a+b, 0);
+  const ctrJitter = products.map(() => 0.7 + rand() * 0.7);
+  const roasJitter = products.map(() => 0.6 + rand() * 0.9);
+  return products.map((nm, i) => {
+    const share = weights[i] / wSum;
+    const spend = campaign.spend * share;
+    const revenue = campaign.revenue * share * (0.7 + roasJitter[i] * 0.3);
+    const roas = Math.round((revenue / spend) * 100);
+    const ctr = +(campaign.ctr * ctrJitter[i]).toFixed(2);
+    let status, rec;
+    if (roas >= 220) {
+      status = "good";
+      rec = ctr < campaign.ctr * 0.85
+        ? { kind: "scale", text: "Increase budget — high RoAS, room to scale" }
+        : { kind: "hold", text: "Performing well — no action" };
+    } else if (roas >= 140) {
+      status = "warn";
+      rec = ctr < 1.2
+        ? { kind: "creative", text: "Refresh creative — low CTR dragging RoAS" }
+        : { kind: "bid", text: "Lower bid — diminishing returns" };
+    } else {
+      status = "bad";
+      rec = ctr < 1.0
+        ? { kind: "listing", text: "Review listing quality — clicks not converting" }
+        : { kind: "pause", text: "Consider pausing — RoAS below floor" };
+    }
+    return { nm, spend, revenue, roas, ctr, status, rec };
+  });
+}
+
+// Ensure per-SKU product health is consistent with the campaign's overall status.
+// e.g. a campaign flagged "Needs Action" must surface at least one SKU that needs action.
+function reconcileProductRowsToCampaignStatus(rows, campaign) {
+  if (!rows.length) return rows;
+  const hasBad = rows.some(r => r.status === "bad");
+  const hasWarn = rows.some(r => r.status === "warn");
+  const demote = (r) => {
+    // pick a rec that matches what the campaign-level recommendation is saying
+    const kind = campaign.rec && campaign.rec.kind;
+    let rec;
+    if (kind === "bid-roas") {
+      rec = { kind: "listing", text: "Under-bid — losing impressions to competitors" };
+    } else if (kind === "budget") {
+      rec = { kind: "listing", text: "Budget-capped — not reaching qualified shoppers" };
+    } else if (kind === "funnel-ctr") {
+      rec = { kind: "listing", text: "Review listing quality — clicks not converting" };
+    } else {
+      rec = r.ctr < 1.0
+        ? { kind: "listing", text: "Review listing quality — clicks not converting" }
+        : { kind: "pause", text: "Consider pausing — RoAS below floor" };
+    }
+    return { ...r, status: "bad", rec };
+  };
+  const softDemote = (r) => ({
+    ...r,
+    status: "warn",
+    rec: r.ctr < 1.2
+      ? { kind: "creative", text: "Refresh creative — low CTR dragging RoAS" }
+      : { kind: "bid", text: "Lower bid — diminishing returns" },
+  });
+
+  if (campaign.status === "bad" && !hasBad) {
+    // Demote the lowest-RoAS SKU to "bad".
+    let worstIdx = 0;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i].roas < rows[worstIdx].roas) worstIdx = i;
+    }
+    rows = rows.map((r, i) => i === worstIdx ? demote(r) : r);
+  } else if (campaign.status === "warn" && !hasBad && !hasWarn) {
+    let worstIdx = 0;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i].roas < rows[worstIdx].roas) worstIdx = i;
+    }
+    rows = rows.map((r, i) => i === worstIdx ? softDemote(r) : r);
+  }
+  return rows;
+}
+
+function getProductRows(campaign) {
+  return reconcileProductRowsToCampaignStatus(getProductRowsRaw(campaign), campaign);
+}
+
+function ProductBreakdown({ campaign, onApply, onProductOpen }) {
+  const rows = getProductRows(campaign);
+  const skuMatch = (campaign.sub || "").match(/(\d+)\s*SKU/i);
+  const products = rows.map(r => r.nm);
+  const roasVals = rows.map(r => r.roas);
+  const maxR = Math.max(...roasVals);
+  const minR = Math.min(...roasVals);
+  let seed = campaign.id.charCodeAt(1) * 7;
+  const [expProducts, setExpProducts] = useStateT(() => new Set());
+  const toggleProduct = (i) => setExpProducts(prev => { const next = new Set(prev); next.has(i) ? next.delete(i) : next.add(i); return next; });
+
+  return (
+    <div className="product-breakdown">
+      <div className="pb-head">
+        <h4>Product breakdown</h4>
+        <div className="pb-sub">{products.length} of {skuMatch ? skuMatch[1] : products.length} SKUs in this campaign</div>
+      </div>
+      <table className="pb-table">
+        <thead>
+          <tr>
+            <th style={{width:24}}></th>
+            <th>Product</th>
+            <th>Status</th>
+            <th style={{textAlign:"right"}}>RoAS</th>
+            <th style={{textAlign:"right"}}>Spend</th>
+            <th style={{textAlign:"right"}}>CTR</th>
+            <th style={{textAlign:"right"}}>Revenue</th>
+            <th>Recommendation</th>
+            <th style={{width:80}}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => {
+            const tag = r.roas === maxR ? "top" : r.roas === minR && rows.length > 2 ? "bot" : null;
+            const exp = expProducts.has(i);
+            const actionable = r.rec.kind !== "hold";
+            return (
+              <React.Fragment key={i}>
+                <tr className={exp ? "pb-expanded" : ""}
+                  onClick={() => toggleProduct(i)}
+                  onDoubleClick={(e) => { e.stopPropagation(); onProductOpen && onProductOpen(r, campaign); }}
+                  title="Double-click to open product detail"
+                  style={{cursor:"pointer"}}>
+                  <td><span className={`expand-chev ${exp?"open":""}`}><Icon.ChevronRight/></span></td>
+                  <td>
+                    <div className="pb-product">
+                      <div>
+                        <div className="pb-nm">{r.nm}</div>
+                        {tag === "top" && <span className="pb-tag good">Top performer</span>}
+                        {tag === "bot" && <span className="pb-tag bad">Underperforming</span>}
+                      </div>
+                    </div>
+                  </td>
+                  <td><StatusPill s={r.status}/></td>
+                  <td style={{textAlign:"right"}}>
+                    <span className={`pb-roas ${r.roas >= 200 ? "good" : r.roas >= 130 ? "warn" : "bad"}`}>
+                      {r.roas}%
+                    </span>
+                  </td>
+                  <td style={{textAlign:"right"}}>${Math.round(r.spend).toLocaleString()}</td>
+                  <td style={{textAlign:"right"}}>{r.ctr}%</td>
+                  <td style={{textAlign:"right",fontWeight:600}}>${Math.round(r.revenue).toLocaleString()}</td>
+                  <td>
+                    <div className={`pb-rec ${r.status}`}>
+                      <span className="pb-rec-icon">
+                        {r.rec.kind === "scale" && "▲"}
+                        {r.rec.kind === "hold" && "✓"}
+                        {r.rec.kind === "creative" && "✦"}
+                        {r.rec.kind === "bid" && "◆"}
+                        {r.rec.kind === "listing" && "!"}
+                        {r.rec.kind === "pause" && "■"}
+                      </span>
+                      <span className="pb-rec-text">{r.rec.text}</span>
+                    </div>
+                  </td>
+                  <td style={{textAlign:"right"}} onClick={e=>e.stopPropagation()}>
+                    {actionable && (
+                      <button className="pb-take-action" onClick={() => toggleProduct(i)}>
+                        {exp ? "Close" : "Take action"}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+                {exp && (
+                  <tr className="pb-drawer-row">
+                    <td colSpan={9}>
+                      <ProductActionDrawer
+                        product={r}
+                        campaign={campaign}
+                        onApply={(nm) => { onApply && onApply(nm); toggleProduct(i); }}
+                        onDismiss={() => toggleProduct(i)}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ProductActionDrawer({ product, campaign, onApply, onDismiss }) {
+  const REC_DETAILS = {
+    scale: {
+      title: "Increase budget allocation for this SKU",
+      body: `${product.nm} is delivering ${product.roas}% RoAS — well above the campaign target. Shifting budget toward this SKU should drive incremental revenue without efficiency loss.`,
+      primary: "Increase SKU budget",
+      secondary: "Customize allocation",
+      lever: { label: "Daily SKU budget", from: `$${(product.spend/30).toFixed(2)}`, to: `$${(product.spend/30 * 1.4).toFixed(2)}`, lift: "+$1,840 projected revenue/mo" },
+    },
+    hold: {
+      title: "Performing within target — no action needed",
+      body: `${product.nm} is hitting its goal metrics. We'll alert you if anything changes.`,
+      primary: null, secondary: null, lever: null,
+    },
+    creative: {
+      title: "Refresh creative for this SKU",
+      body: `Click-through rate (${product.ctr}%) is below benchmark, dragging down RoAS despite healthy impressions. The image, title, or copy is likely the bottleneck.`,
+      primary: "Request creative refresh",
+      secondary: "View current creative",
+      lever: { label: "Current CTR", from: `${product.ctr}%`, to: "1.8% target", lift: "Closes ~60% of the RoAS gap" },
+    },
+    bid: {
+      title: "Lower bid on this SKU",
+      body: `${product.nm} is overbidding — RoAS sits at ${product.roas}% with diminishing returns. A small bid reduction will improve efficiency without losing meaningful volume.`,
+      primary: "Apply bid change",
+      secondary: "Customize bid",
+      lever: { label: "Current bid", from: "$0.88", to: "$0.72", lift: "+18% RoAS, −5% impressions" },
+    },
+    listing: {
+      title: "Review listing quality",
+      body: `${product.nm} is getting clicks but not converting (CTR ${product.ctr}%, RoAS ${product.roas}%). The product detail page — images, description, reviews, price — is the likely culprit. The ad system can't fix this.`,
+      primary: "Open listing diagnostic",
+      secondary: "Flag for merch team",
+      lever: null,
+    },
+    pause: {
+      title: "Pause this SKU",
+      body: `RoAS is at ${product.roas}%, well below your floor. After ${Math.round(product.spend)}$ spent, the data suggests this SKU isn't a fit for paid placement right now.`,
+      primary: "Pause SKU",
+      secondary: "Keep running",
+      lever: null,
+    },
+  };
+  const d = REC_DETAILS[product.rec.kind];
+  const [showFrontier, setShowFrontier] = React.useState(false);
+  const showsFrontierLink = product.rec.kind === "scale" || product.rec.kind === "bid";
+  return (
+    <div className={`product-action ${product.status}`}>
+      <div className="pa-head">
+        <div className="pa-icon">
+          {product.rec.kind === "scale" && "▲"}
+          {product.rec.kind === "hold" && "✓"}
+          {product.rec.kind === "creative" && "✦"}
+          {product.rec.kind === "bid" && "◆"}
+          {product.rec.kind === "listing" && "!"}
+          {product.rec.kind === "pause" && "■"}
+        </div>
+        <div className="pa-titles">
+          <div className="pa-eyebrow">SKU recommendation · {product.nm}</div>
+          <div className="pa-title">{d.title}</div>
+        </div>
+      </div>
+      <div className="pa-body">{d.body}</div>
+      {d.lever && (
+        <div className="pa-lever">
+          <div className="pa-lever-col">
+            <div className="pa-lever-label">{d.lever.label}</div>
+            <div className="pa-lever-from">{d.lever.from}</div>
+          </div>
+          <div className="pa-arrow">→</div>
+          <div className="pa-lever-col">
+            <div className="pa-lever-label suggested">Suggested</div>
+            <div className="pa-lever-to">{d.lever.to}</div>
+          </div>
+          <div className="pa-lift">{d.lever.lift}</div>
+        </div>
+      )}
+      {showsFrontierLink && (
+        <button className="pa-frontier-toggle" onClick={() => setShowFrontier(!showFrontier)}>
+          {showFrontier ? "Hide" : "Why this recommendation?"} <span style={{transform: showFrontier ? "rotate(90deg)" : "none", display:"inline-block", transition:"transform .15s"}}>›</span>
+        </button>
+      )}
+      {showFrontier && (
+        <div className="pa-frontier">
+          <h4 style={{margin:"0 0 6px",fontSize:17,fontWeight:700}}>Why a high RoAS isn't always a good sign</h4>
+          <div style={{fontWeight:700,color:"var(--accent)",fontSize:15,marginBottom:14}}>RoAS Efficient Frontier</div>
+          <div className="pa-frontier-top">
+            <div className="pa-frontier-text">
+              <div style={{fontSize:15,color:"var(--ink-2)",lineHeight:1.55,marginBottom:14}}>
+                A very high RoAS can mean this SKU is <strong style={{color:"var(--ink)"}}>underbidding</strong> and leaving reach on the table — not that it's performing optimally.
+              </div>
+              <ul className="frontier-points">
+                <li><strong>Efficiency vs. volume:</strong> RoAS alone shouldn't be maximized — it's a tradeoff against sales volume.</li>
+                <li><strong>Too conservative:</strong> an overly cautious bid preserves efficiency but suppresses growth.</li>
+                <li><strong>Why this matters:</strong> raising bid can unlock more demand without pushing the SKU out of the efficient range.</li>
+              </ul>
+            </div>
+            <EfficientFrontier />
+          </div>
+        </div>
+      )}
+      {d.primary && (
+        <div className="pa-actions">
+          <button className="btn btn-primary" onClick={() => onApply(product.nm)}>{d.primary}</button>
+          {d.secondary && <button className="btn btn-secondary">{d.secondary}</button>}
+          <button className="btn btn-ghost" onClick={onDismiss}>Dismiss</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CampaignTable({ rows, onApply, insightLevel = "campaign", onProductOpen, visibleCols, focus }) {
+  const [expanded, setExpanded] = useStateT(() => new Set());
+  React.useEffect(() => { if (focus && focus.id) setExpanded(prev => new Set(prev).add(focus.id)); }, [focus]);
+  const toggleRow = (id) => setExpanded(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  const [hover, setHover] = useStateT(null);
+  const productMode = insightLevel === "product";
+  const vc = visibleCols || { campaign:true, status:true, insight:true, roas:true, spend:true, attrSpend:true, ctr:true, revenue:true };
+  const colSpan = 1 + ["campaign","status","insight","roas","spend","attrSpend","ctr","revenue"].filter(k=>vc[k]).length;
+
+  // Pre-compute per-campaign product rollups for product mode
+  const rollups = React.useMemo(() => {
+    const m = {};
+    rows.forEach(r => {
+      const prods = getProductRows(r);
+      const bad = prods.filter(p => p.status === "bad").length;
+      const warn = prods.filter(p => p.status === "warn").length;
+      const good = prods.filter(p => p.status === "good").length;
+      const worstType = bad > 0 ? "bad" : warn > 0 ? "warn" : "good";
+      m[r.id] = { total: prods.length, bad, warn, good, worstType };
+    });
+    return m;
+  }, [rows]);
+
+  return (
+    <table className="campaigns">
+      <thead>
+        <tr>
+          <th style={{width:30}}></th>
+          {vc.campaign && <th>Campaign</th>}
+          {vc.status && <th>Status</th>}
+          {vc.insight && <th>{productMode ? "Product Health" : "Insight"}</th>}
+          {vc.roas && <th style={{textAlign:"right"}}>RoAS</th>}
+          {vc.spend && <th style={{textAlign:"right"}}>Spend</th>}
+          {vc.attrSpend && <th style={{textAlign:"right"}}>Attributed Spend</th>}
+          {vc.ctr && <th style={{textAlign:"right"}}>CTR</th>}
+          {vc.revenue && <th style={{textAlign:"right"}}>Revenue</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(r => {
+          const exp = expanded.has(r.id);
+          const ru = rollups[r.id];
+          return (
+            <React.Fragment key={r.id}>
+              <tr className={exp?"expanded":""} onClick={() => toggleRow(r.id)}>
+                <td><span className="expand-chev"><Icon.ChevronRight/></span></td>
+                {vc.campaign && <td>
+                  <div className="campaign-name">
+                    <span className="nm">
+                      <span className={`active-dot ${r.active ? "on" : "off"}`} title={r.active ? "Active" : "Paused"}/>
+                      {r.name}
+                    </span>
+                    <span className="sub">
+                      <span className={`active-tag ${r.active ? "on" : "off"}`}>
+                        {r.active ? "Active" : "Paused"}
+                      </span>
+                      {r.sub}
+                    </span>
+                  </div>
+                </td>}
+                {vc.status && <td><StatusPill s={r.status}/></td>}
+                {vc.insight && <td style={{position:"relative"}}
+                    onMouseEnter={()=>setHover(r.id)} onMouseLeave={()=>setHover(null)}>
+                  {productMode ? (
+                    <div className="rollup-cell">
+                      <div className="rollup-bar">
+                        {ru.bad > 0 && <span className="seg bad" style={{flex: ru.bad}} title={`${ru.bad} need action`}/>}
+                        {ru.warn > 0 && <span className="seg warn" style={{flex: ru.warn}} title={`${ru.warn} attention`}/>}
+                        {ru.good > 0 && <span className="seg good" style={{flex: ru.good}} title={`${ru.good} healthy`}/>}
+                      </div>
+                      <div className="rollup-text">
+                        {ru.bad > 0 && <span className="rt bad"><b>{ru.bad}</b> need action</span>}
+                        {ru.warn > 0 && <span className="rt warn"><b>{ru.warn}</b> attention</span>}
+                        {ru.bad === 0 && ru.warn === 0 && <span className="rt good">All {ru.total} healthy</span>}
+                        <span className="rt sub">of {ru.total} SKUs</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className={`insight-cell ${r.insightType}`}>
+                      <span className="ico">
+                        {r.insightType === "bad" ? <Icon.Alert/> : r.insightType === "warn" ? <Icon.Alert/> : <Icon.Check/>}
+                      </span>
+                      {r.insight}
+                    </span>
+                  )}
+                  {!productMode && hover === r.id && r.rec && (
+                    <div className="tip show" style={{top:"100%",left:16,marginTop:6}}>
+                      <strong>Why this was flagged</strong>
+                      <div style={{marginTop:4}}>{r.rec.body.slice(0,140)}…</div>
+                      <div style={{marginTop:6,fontSize:11,opacity:.7}}>Click the row for full recommendation.</div>
+                    </div>
+                  )}
+                </td>}
+                {vc.roas && <td style={{textAlign:"right"}}>
+                  <div style={{fontWeight:600}}>{r.roas}%</div>
+                  <div style={{fontSize:11,color: r.roasDelta>0?"var(--good)":"var(--bad)"}}>
+                    {r.roasDelta>0?"+":""}{r.roasDelta}%
+                  </div>
+                </td>}
+                {vc.spend && <td style={{textAlign:"right"}}>${r.spend.toLocaleString()}</td>}
+                {vc.attrSpend && <td style={{textAlign:"right"}}>
+                  <div>${(r.attrSpend ?? Math.round(r.spend*0.88)).toLocaleString()}</div>
+                  <div style={{fontSize:11,color:"var(--ink-3)"}}>
+                    {Math.round(((r.attrSpend ?? r.spend*0.88)/r.spend)*100)}% of spend
+                  </div>
+                </td>}
+                {vc.ctr && <td style={{textAlign:"right"}}>{r.ctr}%</td>}
+                {vc.revenue && <td style={{textAlign:"right"}}>
+                  <div style={{fontWeight:600}}>${r.revenue.toLocaleString()}</div>
+                  {typeof r.revenueDelta === "number" && (
+                    <div style={{fontSize:11,color: r.revenueDelta>0?"var(--good)":"var(--bad)"}}>
+                      {r.revenueDelta>0?"+":""}{r.revenueDelta}%
+                    </div>
+                  )}
+                </td>}
+              </tr>
+              {exp && productMode && (
+                <tr className="drawer-row"><td colSpan={colSpan}>
+                  <ProductBreakdown campaign={r} onApply={onApply} onProductOpen={onProductOpen}/>
+                </td></tr>
+              )}
+              {exp && !productMode && r.rec && (
+                <tr className="drawer-row"><td colSpan={colSpan}>
+                  <RecBlock rec={r.rec} campaign={r} onChange={() => onApply(r.name)}/>
+                  <ProductBreakdown campaign={r} onApply={onApply} onProductOpen={onProductOpen}/>
+                </td></tr>
+              )}
+              {exp && !productMode && !r.rec && (
+                <tr className="drawer-row"><td colSpan={colSpan}>
+                  <div className="drawer" style={{gridTemplateColumns:"1fr"}}>
+                    <div className="rec-block">
+                      <h4>No action needed</h4>
+                      <div className="title">Performing within target</div>
+                      <div className="body">
+                        This campaign is meeting its goal criteria. We'll let you know if anything changes.
+                      </div>
+                    </div>
+                  </div>
+                  <ProductBreakdown campaign={r} onApply={onApply} onProductOpen={onProductOpen}/>
+                </td></tr>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+window.CampaignTable = CampaignTable;
+
+</script>
+<script type="text/babel">
+/* global React, Icon */
+const { useState: useStateL } = React;
+
+function LaunchMilestones({ goal }) {
+  if (goal !== "launch" && goal !== "all") return null;
+
+  const [done, setDone] = useStateL({
+    photos: true,
+    keywords: true,
+    reviews: false,
+    bid: false,
+  });
+
+  const items = [
+    { k: "photos", ic: "Camera", title: "Upload 5+ photos", cap: "2 more to unlock boosted placements" },
+    { k: "keywords", ic: "Tag", title: "Keyword coverage", cap: "Targeting 24/30 recommended terms" },
+    { k: "reviews", ic: "Star", title: "Collect first 10 reviews", cap: "3 of 10 — send review requests" },
+    { k: "bid", ic: "Bolt", title: "Set launch boost bid", cap: "Set a 30-day boost bid to accelerate" },
+  ];
+
+  const completed = Object.values(done).filter(Boolean).length;
+  const pct = (completed/items.length)*100;
+
+  return (
+    <div className="launch-card">
+      <div>
+        <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"4px 10px",background:"rgba(151,71,255,0.2)",
+          borderRadius:999,fontSize:11,fontWeight:600,letterSpacing:".06em",textTransform:"uppercase",color:"#e0bce8"}}>
+          <Icon.Rocket/> Launch Readiness
+        </div>
+        <h3 style={{marginTop:10}}>Arcadia Dining Set 2026</h3>
+        <div className="launch-sub">
+          Complete these actions to unlock better placement and stronger early performance. Products that hit 100% readiness see <b style={{color:"#fff"}}>2.3× faster</b> time-to-first-sale on average.
+        </div>
+        <div className="launch-progress"><i style={{width: pct+"%"}}/></div>
+        <div className="launch-progress-text">{completed} of {items.length} milestones complete · {Math.round(pct)}% ready</div>
+      </div>
+      <div className="milestones">
+        {items.map(it => {
+          const Ic = Icon[it.ic];
+          return (
+            <div key={it.k} className={`milestone ${done[it.k]?"done":""}`}
+              onClick={() => setDone({...done, [it.k]: !done[it.k]})}>
+              <span className="tick"><Icon.Check/></span>
+              <div className="badge"><Ic/></div>
+              <div className="title">{it.title}</div>
+              <div className="cap">{it.cap}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+window.LaunchMilestones = LaunchMilestones;
+
+</script>
+<script type="text/babel">
+/* global React */
+const { useState: useStateP } = React;
+
+function ProductDetail({ product, campaign, onBack, onApply }) {
+  const [tab, setTab] = useStateP("overview");
+
+  // Synthesize a 28-day timeseries deterministically
+  let seed = product.nm.length * 13 + (campaign.id.charCodeAt(1) || 99);
+  const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const series = Array.from({length: 28}, (_, i) => {
+    const wobble = (rand() - 0.5) * 0.4;
+    const trend = product.status === "bad" ? -i*0.008 : product.status === "good" ? i*0.005 : 0;
+    return {
+      day: i + 1,
+      spend: Math.max(2, (product.spend / 28) * (1 + wobble + trend)),
+      revenue: Math.max(2, (product.revenue / 28) * (1 + wobble + trend * 1.4)),
+      impressions: Math.round(800 + rand() * 1400),
+      clicks: Math.round(15 + rand() * 25),
+    };
+  });
+
+  const REC_DETAILS = {
+    scale: { title: "Increase budget allocation", primary: "Increase SKU budget", icon: "▲" },
+    hold: { title: "Performing within target", primary: null, icon: "✓" },
+    creative: { title: "Refresh creative", primary: "Request creative refresh", icon: "✦" },
+    bid: { title: "Lower bid", primary: "Apply bid change", icon: "◆" },
+    listing: { title: "Review listing quality", primary: "Open listing diagnostic", icon: "!" },
+    pause: { title: "Consider pausing", primary: "Pause SKU", icon: "■" },
+  };
+  const rec = REC_DETAILS[product.rec.kind];
+
+  const totalImp = series.reduce((s, d) => s + d.impressions, 0);
+  const totalClicks = series.reduce((s, d) => s + d.clicks, 0);
+  const cvr = (product.revenue / 80 / totalClicks * 100).toFixed(1); // synthetic conv
+
+  // Build chart paths
+  const W = 720, H = 180, P = 20;
+  const maxR = Math.max(...series.map(d => d.revenue));
+  const maxS = Math.max(...series.map(d => d.spend));
+  const x = i => P + (i / (series.length - 1)) * (W - 2*P);
+  const yR = v => H - P - (v / maxR) * (H - 2*P);
+  const yS = v => H - P - (v / maxS) * (H - 2*P);
+  const pathR = series.map((d, i) => `${i===0?"M":"L"}${x(i)},${yR(d.revenue)}`).join(" ");
+  const pathS = series.map((d, i) => `${i===0?"M":"L"}${x(i)},${yS(d.spend)}`).join(" ");
+  const areaR = pathR + ` L${x(series.length-1)},${H-P} L${x(0)},${H-P} Z`;
+
+  return (
+    <div className="product-detail">
+      <div className="pd-back-bar">
+        <button className="pd-back" onClick={onBack}>
+          ← Back to campaigns
+        </button>
+        <div className="pd-breadcrumbs">
+          <span className="bc">Campaigns</span>
+          <span className="bc-sep">/</span>
+          <span className="bc">{campaign.name}</span>
+          <span className="bc-sep">/</span>
+          <span className="bc current">{product.nm}</span>
+        </div>
+      </div>
+
+      <div className="pd-hero">
+        <div className="pd-hero-left">
+          <div className="pd-eyebrow">SKU · {campaign.sub}</div>
+          <h1 className="pd-title">{product.nm}</h1>
+          <div className="pd-meta">
+            <span className={`pd-status status-pill ${product.status === "good" ? "good" : product.status === "warn" ? "warn" : "bad"}`}>
+              <span className="d"/>
+              {product.status === "good" ? "Healthy" : product.status === "warn" ? "Attention" : "Needs Action"}
+            </span>
+            <span className="pd-divider"/>
+            <span className="pd-meta-item">Part of <strong>{campaign.name}</strong></span>
+            <span className="pd-divider"/>
+            <span className="pd-meta-item">SKU ID · {campaign.id.toUpperCase()}-{product.nm.split(" ").map(w=>w[0]).join("").toUpperCase()}</span>
+          </div>
+        </div>
+        <div className="pd-hero-right">
+          {rec.primary && (
+            <button className="btn btn-primary pd-cta" onClick={() => onApply(product.nm)}>
+              {rec.icon} {rec.primary}
+            </button>
+          )}
+          <button className="btn btn-secondary">View on Wayfair</button>
+        </div>
+      </div>
+
+      <div className="pd-tabs">
+        {["overview","performance","recommendations","creative","placements"].map(tb => (
+          <button key={tb} className={`pd-tab ${tab===tb?"active":""}`} onClick={()=>setTab(tb)}>
+            {tb.charAt(0).toUpperCase() + tb.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {tab === "overview" && (
+        <div className="pd-content">
+          <div className="pd-kpi-row">
+            <div className="pd-kpi">
+              <div className="pd-kpi-label">RoAS</div>
+              <div className={`pd-kpi-val ${product.roas >= 200 ? "good" : product.roas >= 130 ? "warn" : "bad"}`}>
+                {product.roas}%
+              </div>
+              <div className="pd-kpi-sub">Target: 180%</div>
+            </div>
+            <div className="pd-kpi">
+              <div className="pd-kpi-label">Spend (28d)</div>
+              <div className="pd-kpi-val">${Math.round(product.spend).toLocaleString()}</div>
+              <div className="pd-kpi-sub">${(product.spend/28).toFixed(2)}/day avg</div>
+            </div>
+            <div className="pd-kpi">
+              <div className="pd-kpi-label">Revenue (28d)</div>
+              <div className="pd-kpi-val">${Math.round(product.revenue).toLocaleString()}</div>
+              <div className="pd-kpi-sub">{product.roas >= 180 ? "+" : ""}{(product.roas - 180).toFixed(0)}% vs. target</div>
+            </div>
+            <div className="pd-kpi">
+              <div className="pd-kpi-label">CTR</div>
+              <div className="pd-kpi-val">{product.ctr}%</div>
+              <div className="pd-kpi-sub">{(totalClicks/totalImp*100).toFixed(2)}% benchmark</div>
+            </div>
+            <div className="pd-kpi">
+              <div className="pd-kpi-label">Impressions</div>
+              <div className="pd-kpi-val">{totalImp.toLocaleString()}</div>
+              <div className="pd-kpi-sub">{totalClicks.toLocaleString()} clicks</div>
+            </div>
+          </div>
+
+          <div className="pd-chart-card">
+            <div className="pd-chart-head">
+              <div>
+                <h3>Revenue · Spend</h3>
+                <div className="pd-chart-sub">Last 28 days</div>
+              </div>
+              <div className="pd-chart-legend">
+                <span><i style={{background:"#782b7f"}}/>Revenue</span>
+                <span><i style={{background:"#a59726"}}/>Spend</span>
+              </div>
+            </div>
+            <svg viewBox={`0 0 ${W} ${H}`} className="pd-chart">
+              <defs>
+                <linearGradient id="pdRevFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#782b7f" stopOpacity="0.18"/>
+                  <stop offset="100%" stopColor="#782b7f" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+              {[0.25, 0.5, 0.75].map(p => (
+                <line key={p} x1={P} x2={W-P} y1={P + (H-2*P)*p} y2={P + (H-2*P)*p}
+                  stroke="#eee" strokeWidth="1"/>
+              ))}
+              <path d={areaR} fill="url(#pdRevFill)"/>
+              <path d={pathR} fill="none" stroke="#782b7f" strokeWidth="2.5" strokeLinejoin="round"/>
+              <path d={pathS} fill="none" stroke="#a59726" strokeWidth="2" strokeDasharray="4 3" strokeLinejoin="round"/>
+            </svg>
+          </div>
+
+          <div className="pd-cols">
+            <div className="pd-card">
+              <h4>Conversion funnel</h4>
+              <div className="pd-funnel">
+                {[
+                  { lbl: "Impressions", n: totalImp.toLocaleString(), pct: 100 },
+                  { lbl: "Clicks", n: totalClicks.toLocaleString(), pct: 8, problem: product.ctr < 1.2 },
+                  { lbl: "Add to cart", n: Math.round(totalClicks * 0.18).toLocaleString(), pct: 4 },
+                  { lbl: "Purchase", n: Math.round(totalClicks * cvr / 100).toLocaleString(), pct: 2 },
+                ].map((f, i) => (
+                  <div key={i} className={`pd-fstep ${f.problem ? "problem" : ""}`}>
+                    <div className="pd-flbl">{f.lbl}</div>
+                    <div className="pd-fbar"><i style={{ width: Math.max(f.pct, 4) + "%" }}/></div>
+                    <div className="pd-fnum">{f.n}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="pd-card">
+              <h4>Listing quality</h4>
+              <div className="pd-listing">
+                <div className="pd-listing-row">
+                  <span>Hero image</span>
+                  <span className="pd-score good">9.1 / 10</span>
+                </div>
+                <div className="pd-listing-row">
+                  <span>Title clarity</span>
+                  <span className="pd-score good">8.4 / 10</span>
+                </div>
+                <div className="pd-listing-row">
+                  <span>Description completeness</span>
+                  <span className={`pd-score ${product.ctr < 1.2 ? "warn" : "good"}`}>{product.ctr < 1.2 ? "6.2" : "8.0"} / 10</span>
+                </div>
+                <div className="pd-listing-row">
+                  <span>Customer reviews</span>
+                  <span className="pd-score good">4.6 ★ (218)</span>
+                </div>
+                <div className="pd-listing-row">
+                  <span>Price competitiveness</span>
+                  <span className="pd-score warn">Market avg +4%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === "recommendations" && (
+        <div className="pd-content">
+          <div className={`pd-rec-hero ${product.status}`}>
+            <div className="pd-rec-icon">{rec.icon}</div>
+            <div>
+              <div className="pd-rec-eyebrow">Primary recommendation</div>
+              <h2 className="pd-rec-title">{rec.title}</h2>
+              <p className="pd-rec-body">{product.rec.text}. Detailed projection and lever shown below.</p>
+              {rec.primary && (
+                <div style={{display:"flex",gap:8,marginTop:14}}>
+                  <button className="btn btn-primary" onClick={() => onApply(product.nm)}>{rec.primary}</button>
+                  <button className="btn btn-secondary">Customize</button>
+                  <button className="btn btn-ghost">Dismiss</button>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="pd-card" style={{marginTop:20}}>
+            <h4>Other levers we considered</h4>
+            <div style={{display:"flex",flexDirection:"column",gap:8,fontSize:13,marginTop:10}}>
+              {[
+                { nm: "Adjust bid", impact: "Med", effort: "Low", picked: product.rec.kind === "bid" },
+                { nm: "Refresh creative", impact: "High", effort: "Med", picked: product.rec.kind === "creative" },
+                { nm: "Expand keywords", impact: "Low", effort: "Low" },
+                { nm: "Increase budget", impact: "High", effort: "Low", picked: product.rec.kind === "scale" },
+                { nm: "Review listing", impact: "High", effort: "High", picked: product.rec.kind === "listing" },
+              ].map((r, i) => (
+                <div key={i} className={`pd-lever ${r.picked ? "picked" : ""}`}>
+                  <span>{r.nm}</span>
+                  <span className="pd-lever-meta">Impact: <b>{r.impact}</b> · Effort: <b>{r.effort}</b></span>
+                  {r.picked && <span className="pd-lever-tag">Recommended</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === "performance" && (
+        <div className="pd-content">
+          <div className="pd-card">
+            <h4>Daily breakdown</h4>
+            <table className="pd-table">
+              <thead>
+                <tr><th>Day</th><th style={{textAlign:"right"}}>Spend</th><th style={{textAlign:"right"}}>Revenue</th><th style={{textAlign:"right"}}>Impressions</th><th style={{textAlign:"right"}}>Clicks</th><th style={{textAlign:"right"}}>RoAS</th></tr>
+              </thead>
+              <tbody>
+                {series.slice(-10).reverse().map((d, i) => (
+                  <tr key={i}>
+                    <td>Day {d.day}</td>
+                    <td style={{textAlign:"right"}}>${d.spend.toFixed(2)}</td>
+                    <td style={{textAlign:"right",fontWeight:600}}>${d.revenue.toFixed(2)}</td>
+                    <td style={{textAlign:"right"}}>{d.impressions.toLocaleString()}</td>
+                    <td style={{textAlign:"right"}}>{d.clicks}</td>
+                    <td style={{textAlign:"right"}}>{Math.round(d.revenue/d.spend*100)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {tab === "creative" && (
+        <div className="pd-content">
+          <div className="pd-card">
+            <h4>Active creative</h4>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginTop:12}}>
+              {[1,2,3].map(i => (
+                <div key={i} className="pd-creative-card">
+                  <div className="pd-creative-img" style={{background:`hsl(${(seed*i)%360}, 25%, 88%)`}}>
+                    <span>{product.nm.split(" ").map(w=>w[0]).slice(0,2).join("")}</span>
+                  </div>
+                  <div className="pd-creative-meta">
+                    <div style={{fontWeight:600}}>Variant {i}</div>
+                    <div style={{fontSize:11,color:"var(--ink-3)"}}>CTR: {(product.ctr * (0.8 + i*0.15)).toFixed(2)}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === "placements" && (
+        <div className="pd-content">
+          <div className="pd-card">
+            <h4>Top placements</h4>
+            <table className="pd-table">
+              <thead><tr><th>Placement</th><th style={{textAlign:"right"}}>Impressions</th><th style={{textAlign:"right"}}>Clicks</th><th style={{textAlign:"right"}}>Revenue</th></tr></thead>
+              <tbody>
+                {[
+                  { p: "Search results — page 1", i: Math.round(totalImp * 0.42), c: Math.round(totalClicks * 0.55), r: product.revenue * 0.6 },
+                  { p: "Category browse", i: Math.round(totalImp * 0.28), c: Math.round(totalClicks * 0.22), r: product.revenue * 0.18 },
+                  { p: "Related products", i: Math.round(totalImp * 0.18), c: Math.round(totalClicks * 0.14), r: product.revenue * 0.12 },
+                  { p: "Homepage promo", i: Math.round(totalImp * 0.12), c: Math.round(totalClicks * 0.09), r: product.revenue * 0.10 },
+                ].map((r, i) => (
+                  <tr key={i}>
+                    <td>{r.p}</td>
+                    <td style={{textAlign:"right"}}>{r.i.toLocaleString()}</td>
+                    <td style={{textAlign:"right"}}>{r.c}</td>
+                    <td style={{textAlign:"right",fontWeight:600}}>${Math.round(r.r).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+window.ProductDetail = ProductDetail;
+
+</script>
+<script type="text/babel">
+/* global React, ReactDOM, Icon, GOALS, GOAL_KPIS, CAMPAIGNS, SpendChart, CampaignTable, LaunchMilestones, GoalModal */
+const { useState, useEffect, useMemo } = React;
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "iconSize": "medium",
+  "accentColor": "#782b7f",
+  "density": "comfortable",
+  "showExplainability": true,
+  "insightLevel": "product"
+} /*EDITMODE-END*/;
+
+function AdvantageScore({ goal, onClick }) {
+  const total = 7;
+  const needAction = CAMPAIGNS.filter((c) => c.status !== "good").length;
+  const healthy = total - needAction;
+  const score = Math.round(healthy / total * 100);
+
+  // ring
+  const R = 40,C = 2 * Math.PI * R;
+  const fill = score / 100 * C;
+
+  return (
+    <div className="advantage-card" style={{ fontSize: "22px" }}>
+      <div className="label">AdVantage Score <span className="badge-beta">NEW</span></div>
+      <div className="gauge" style={{ fontSize: "22px" }}>
+        <div className="gauge-ring" style={{ fontSize: "22px" }}>
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r={R} fill="none" stroke="#ecd9f0" strokeWidth="8" />
+            <circle cx="50" cy="50" r={R} fill="none" stroke="#782b7f" strokeWidth="8"
+            strokeDasharray={`${fill} ${C}`} strokeLinecap="round" />
+          </svg>
+          <div className="val" style={{ fontSize: "22px", textAlign: "center", width: "96px" }}>{score}%</div>
+        </div>
+        <div className="txt">
+          <div><strong>{healthy} of {total} campaigns</strong> are healthy.</div>
+          <div style={{ marginTop: 4 }}>{needAction} need attention — mostly around bid & budget configuration.</div>
+        </div>
+      </div>
+      <button className="cta" onClick={onClick}>Review {needAction} recommendations →</button>
+    </div>);
+
+}
+
+function KpiTile({ k, highlight, onInfoEnter, onInfoLeave }) {
+  const pct = Math.abs(k.delta);
+  return (
+    <div className={`kpi ${highlight ? "highlight" : ""}`}>
+      <div className="k-label">
+        {k.label}
+        {k.help &&
+        <span className="i"
+        onMouseEnter={(e) => onInfoEnter(k.help, e.target)}
+        onMouseLeave={onInfoLeave}>
+          <Icon.Info/></span>
+        }
+      </div>
+      <div className="k-val">{k.val}</div>
+      <span className={`k-delta ${k.delta > 0 ? "up" : k.delta < 0 ? "down" : "flat"}`}>
+        <span className="arrow">
+          <svg viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="1,10 7,5 11,8 19,2" />
+            <polyline points="14,2 19,2 19,7" />
+          </svg>
+        </span>
+        <span><span className="pct">{pct}{k.unit || "%"}</span> vs. last 28d</span>
+      </span>
+    </div>);
+
+}
+
+function Tip({ data }) {
+  if (!data) return null;
+  const { text, rect } = data;
+  const top = rect.top + window.scrollY + rect.height + 6;
+  const left = rect.left + window.scrollX - 10;
+  return (
+    <div className="tip show" style={{ top, left, position: "absolute" }}>
+      {text}
+    </div>);
+
+}
+
+function InfoPanel({ open, onClose, anchorRect, onGo }) {
+  if (!open) return null;
+  const top = anchorRect.top + window.scrollY + anchorRect.height + 8;
+  const left = Math.max(anchorRect.left + window.scrollX - 40, window.scrollX + 88);
+  return (
+    <div className="info-panel show" style={{ top, left, position: "absolute" }} onClick={(e) => e.stopPropagation()}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <h5>What drives this status?</h5>
+        <span style={{ cursor: "pointer", color: "var(--ink-3)" }} onClick={onClose}><Icon.X /></span>
+      </div>
+      <div style={{ fontSize: 11, color: "var(--ink-3)", marginBottom: 6 }}>
+        AdVantage aggregates four signals. A status drops to "Needs Action" when two or more score red.
+      </div>
+      <div className="factor"><b>Bid competitiveness</b><span className="v neg">● Below market</span></div>
+      <div className="factor"><b>Budget utilization</b><span className="v neg">● Capped daily</span></div>
+      <div className="factor"><b>Funnel health (CTR → Buy)</b><span className="v pos">● Healthy</span></div>
+      <div className="factor"><b>Creative quality</b><span className="v">● Neutral</span></div>
+      <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 8, lineHeight: 1.4 }}>
+        We only surface factors the ad system can influence. Issues like pricing or checkout sit with other teams.
+      </div>
+      {onGo && <button className="btn btn-primary" style={{ width: "100%", marginTop: 12, justifyContent: "center" }} onClick={onGo}>Go to recommendations →</button>}
+    </div>);
+
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAKS);
+  const [goal, setGoal] = useState("all");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [tip, setTip] = useState(null);
+  const [info, setInfo] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedProduct, setSelectedProduct] = useState(null); // { product, campaign }
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [colsOpen, setColsOpen] = useState(false);
+  const [focus, setFocus] = useState(null);
+  const goToRecs = () => {
+    setInfo(null);
+    setSelectedProduct(null);
+    setFilterStatus("all");
+    const first = CAMPAIGNS.find((c) => c.status === "bad") || CAMPAIGNS.find((c) => c.status !== "good");
+    if (first) { setGoal("all"); setFocus({ id: first.id, t: Date.now() }); }
+    setTimeout(() => {
+      const el = document.querySelector(".table-wrap");
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+    }, 60);
+  };
+  const [advFilters, setAdvFilters] = useState({
+    activeOnly: false,
+    minRoas: 0,
+    minSpend: 0,
+    goals: { bestsellers: true, launch: true, inventory: true, other: true }
+  });
+  const ALL_COLS = [
+  { id: "campaign", label: "Campaign", required: true },
+  { id: "status", label: "Status" },
+  { id: "insight", label: "Insight" },
+  { id: "roas", label: "RoAS" },
+  { id: "spend", label: "Spend" },
+  { id: "attrSpend", label: "Attributed Spend" },
+  { id: "ctr", label: "CTR" },
+  { id: "revenue", label: "Revenue" }];
+
+  const [visibleCols, setVisibleCols] = useState(() =>
+  Object.fromEntries(ALL_COLS.map((c) => [c.id, true]))
+  );
+
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 2600);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
+
+  const rows = useMemo(() => {
+    let r = CAMPAIGNS;
+    if (goal !== "all") r = r.filter((c) => c.goal === goal);
+    if (filterStatus !== "all") r = r.filter((c) => c.status === filterStatus);
+    if (advFilters.activeOnly) r = r.filter((c) => c.active);
+    if (advFilters.minRoas > 0) r = r.filter((c) => c.roas >= advFilters.minRoas);
+    if (advFilters.minSpend > 0) r = r.filter((c) => c.spend >= advFilters.minSpend);
+    const goalKeys = Object.keys(advFilters.goals).filter((k) => advFilters.goals[k]);
+    if (goalKeys.length < 4) {
+      r = r.filter((c) => goalKeys.includes(c.goal) || goalKeys.includes("other") && !["bestsellers", "launch", "inventory"].includes(c.goal));
+    }
+    return r;
+  }, [goal, filterStatus, advFilters]);
+
+  const kpis = GOAL_KPIS[goal] || GOAL_KPIS.all;
+
+  const onInfoEnter = (text, el) => {
+    setTip({ text, rect: el.getBoundingClientRect() });
+  };
+  const onInfoLeave = () => setTip(null);
+
+  const showInfoPanel = (el) => {
+    setInfo({ rect: el.getBoundingClientRect() });
+  };
+
+  const applyChange = (name) => {
+    setToast(`Change applied to “${name.slice(0, 36)}…”`);
+  };
+
+  const iconSizes = {
+    small: { xs: 10, sm: 12, md: 14, lg: 16 },
+    medium: { xs: 12, sm: 14, md: 18, lg: 22 },
+    large: { xs: 14, sm: 18, md: 22, lg: 28 }
+  };
+  const iz = iconSizes[t.iconSize] || iconSizes.medium;
+  const densityPad = t.density === "compact" ? 10 : t.density === "spacious" ? 20 : 14;
+
+  const rootStyle = {
+    "--icon-xs": iz.xs + "px",
+    "--icon-sm": iz.sm + "px",
+    "--icon-md": iz.md + "px",
+    "--icon-lg": iz.lg + "px",
+    "--accent": t.accentColor,
+    "--row-pad-y": densityPad + "px"
+  };
+
+  return (
+    <div className="shell" style={rootStyle}>
+      <aside className="sidebar">
+        <div className="nav-item nav-hamburger"><Icon.Hamburger /></div>
+        <div className="nav">
+          <div className="nav-item" title="Performance"><Icon.Bars /></div>
+          <div className="nav-item" title="Insights"><Icon.Diamond /></div>
+          <div className="nav-item" title="Account"><Icon.Lock /></div>
+          <div className="nav-item" title="Catalog"><Icon.Grid4 /></div>
+          <div className="nav-item active" title="Advertising"><Icon.Storefront /></div>
+          <div className="nav-item" title="Promotions"><Icon.TagSimple /></div>
+          <div className="nav-item" title="Listings"><Icon.Monitor /></div>
+          <div className="nav-item" title="Operations"><Icon.HexGrid /></div>
+          <div className="nav-item" title="Reports"><Icon.Document /></div>
+          <div className="nav-item" title="Inbox"><Icon.Inbox /></div>
+          <div className="nav-item" style={{ marginTop: "auto" }} title="Help"><Icon.Help /></div>
+        </div>
+      </aside>
+
+      <div className="content">
+        <header className="topbar" style={{ fontSize: "15px" }}>
+          <div className="brand" style={{ alignItems: "center", gap: "2px" }}>
+            <img src="wayfair-logo.png" alt="wayfair" style={{ display: "block", height: "20px", width: "79px", marginRight: "8px" }} />
+            <span style={{ color: "var(--ink-3)", fontWeight: 500, fontSize: "16px" }}>Partner Home</span>
+          </div>
+          <div className="right">
+            <span>Store: <b style={{ color: "var(--ink)" }}>Northfield Furniture Co.</b></span>
+            <span>·</span>
+            <span>Last 30 days ▾</span>
+            <div className="avatar">NF</div>
+          </div>
+        </header>
+
+        <div className="page-head">
+          <div className="breadcrumb">
+            <span>Home</span><span className="sep">/</span><span className="current">Advertising</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+            <h1>Advertising</h1>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button className="btn btn-secondary">Bulk Updates</button>
+              <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
+                <Icon.Plus /> Create Campaign
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <nav className="subnav">
+          <a className="active">Campaigns</a>
+          <a>Bulk Updates</a>
+          <a>Reports</a>
+          <a>Wallet</a>
+        </nav>
+
+        {/* Goal tabs — solution 2 */}
+        <div className="goal-tabs">
+          {GOALS.map((g) => {const Ic = Icon[g.icon] || Icon.Target;
+            return (
+              <button key={g.id}
+              className={`goal-tab ${goal === g.id ? "active" : ""}`}
+              onClick={() => setGoal(g.id)}>
+                <Ic />
+                {g.label}
+                {g.count > 0 && <span className="count">{g.count}</span>}
+              </button>);
+
+          })}
+        </div>
+
+        <div className="dash">
+          {selectedProduct ?
+          <ProductDetail
+            product={selectedProduct.product}
+            campaign={selectedProduct.campaign}
+            onBack={() => setSelectedProduct(null)}
+            onApply={applyChange} /> :
+
+
+          <React.Fragment>
+          {/* Row 1 — AdVantage + KPI grid (solutions 9, 2) */}
+          <div className="advantage-row" style={{ fontSize: "22px" }}>
+            <AdvantageScore goal={goal} onClick={(e) => {
+                if (e && e.currentTarget) showInfoPanel(e.currentTarget);
+              }} />
+            <div className="kpi-grid">
+              {kpis.map((k, i) =>
+                <KpiTile key={i} k={k} highlight={i === 0 && goal !== "all"}
+                onInfoEnter={onInfoEnter} onInfoLeave={onInfoLeave} />
+                )}
+            </div>
+          </div>
+
+          {/* Chart */}
+          <div className="chart-card">
+            <div className="chart-head">
+              <div>
+                <h3>
+                  {goal === "bestsellers" ? "Rank change · Spend" :
+                    goal === "launch" ? "New-buyer reach · Impressions" :
+                    goal === "inventory" ? "Sell-through · Spend" :
+                    "Spend · Impressions"}
+                </h3>
+                <div style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 2 }}>
+                  Metrics adapt to this goal. {goal === "inventory" && "Budget cap shaded in red."}
+                </div>
+              </div>
+              <div className="chart-legend">
+                <span><i style={{ background: "#782b7f" }} />Spend</span>
+                <span><i style={{ background: "#a59726", height: 2, borderRadius: 0 }} />Impressions</span>
+                {goal === "inventory" && <span><i style={{ background: "#c54549", opacity: .4 }} />Budget cap hit</span>}
+              </div>
+            </div>
+            <SpendChart highlightDip={goal === "inventory"} />
+          </div>
+
+          {/* Launch gamification — solution 10 */}
+          <LaunchMilestones goal={goal} />
+
+          {/* Campaign table — solutions 3, 4 */}
+          <div className="section-head">
+            <h2>
+              {goal === "all" ? "All campaigns" :
+                goal === "bestsellers" ? "Bestseller campaigns" :
+                goal === "launch" ? "Launch campaigns" :
+                "Inventory campaigns"}
+            </h2>
+            <div className="hint"></div>
+          </div>
+
+          <div className="table-wrap">
+            <div className="table-toolbar">
+              <div className="searchbar">
+                <Icon.Search />
+                <input placeholder="Search campaigns, SKUs, products" />
+              </div>
+              <div className="chip-row">
+                <button className={`chip ${filterStatus === "all" ? "active" : ""}`} onClick={() => setFilterStatus("all")}>{`All (${CAMPAIGNS.length})`}</button>
+                <button className={`chip ${filterStatus === "bad" ? "active" : ""}`} onClick={() => setFilterStatus("bad")}>
+                  <span className="dot bad" />{`Needs Action (${CAMPAIGNS.filter((c) => c.status === "bad").length})`}
+                </button>
+                <button className={`chip ${filterStatus === "warn" ? "active" : ""}`} onClick={() => setFilterStatus("warn")}>
+                  <span className="dot warn" />{`Attention (${CAMPAIGNS.filter((c) => c.status === "warn").length})`}
+                </button>
+                <button className={`chip ${filterStatus === "good" ? "active" : ""}`} onClick={() => setFilterStatus("good")}>
+                  <span className="dot good" />{`Healthy (${CAMPAIGNS.filter((c) => c.status === "good").length})`}
+                </button>
+                <button className="chip" onClick={(e) => showInfoPanel(e.currentTarget)}>
+                  <Icon.Info /> How status is scored
+                </button>
+                <div className="toolbar-spacer" />
+                <div className="popover-host">
+                  <button className={`chip chip-tool ${filterOpen ? "active" : ""}`} onClick={() => {setFilterOpen(!filterOpen);setColsOpen(false);}} style={{ fontWeight: "500" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: "1em", height: "1em" }}><path d="M3 5h18M6 12h12M10 19h4" /></svg>
+                    Filter
+                    {(advFilters.activeOnly || advFilters.minRoas > 0 || advFilters.minSpend > 0 || Object.values(advFilters.goals).some((v) => !v)) && <span className="filter-badge" />}
+                  </button>
+                  {filterOpen &&
+                    <div className="popover" onClick={(e) => e.stopPropagation()}>
+                      <div className="popover-head">
+                        <h5>Filter campaigns</h5>
+                        <span className="po-close" onClick={() => setFilterOpen(false)}><Icon.X /></span>
+                      </div>
+                      <div className="po-section">
+                        <div className="po-label">State</div>
+                        <label className="po-row">
+                          <input type="checkbox" checked={advFilters.activeOnly} onChange={(e) => setAdvFilters({ ...advFilters, activeOnly: e.target.checked })} />
+                          <span>Active campaigns only</span>
+                        </label>
+                      </div>
+                      <div className="po-section">
+                        <div className="po-label">Goal</div>
+                        {[
+                        { k: "bestsellers", l: "Boost Bestsellers" },
+                        { k: "launch", l: "New Product Launch" },
+                        { k: "inventory", l: "Faster Inventory Turnover" },
+                        { k: "other", l: "Other / Uncategorized" }].
+                        map((g) =>
+                        <label key={g.k} className="po-row">
+                            <input type="checkbox" checked={advFilters.goals[g.k]} onChange={(e) => setAdvFilters({ ...advFilters, goals: { ...advFilters.goals, [g.k]: e.target.checked } })} />
+                            <span>{g.l}</span>
+                          </label>
+                        )}
+                      </div>
+                      <div className="po-section">
+                        <div className="po-label">Min RoAS · {advFilters.minRoas}%</div>
+                        <input type="range" min="0" max="500" step="10" value={advFilters.minRoas}
+                        onChange={(e) => setAdvFilters({ ...advFilters, minRoas: +e.target.value })} className="po-slider" />
+                      </div>
+                      <div className="po-section">
+                        <div className="po-label">Min Spend · ${advFilters.minSpend.toLocaleString()}</div>
+                        <input type="range" min="0" max="50000" step="500" value={advFilters.minSpend}
+                        onChange={(e) => setAdvFilters({ ...advFilters, minSpend: +e.target.value })} className="po-slider" />
+                      </div>
+                      <div className="po-foot">
+                        <button className="btn btn-ghost" onClick={() => setAdvFilters({ activeOnly: false, minRoas: 0, minSpend: 0, goals: { bestsellers: true, launch: true, inventory: true, other: true } })}>Reset</button>
+                        <button className="btn btn-primary" onClick={() => setFilterOpen(false)}>Apply</button>
+                      </div>
+                    </div>
+                    }
+                </div>
+                <div className="popover-host">
+                  <button className={`chip chip-tool ${colsOpen ? "active" : ""}`} onClick={() => {setColsOpen(!colsOpen);setFilterOpen(false);}} style={{ fontWeight: "500" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: "1em", height: "1em" }}><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16M15 4v16" /></svg>
+                    Customize columns
+                  </button>
+                  {colsOpen &&
+                    <div className="popover" onClick={(e) => e.stopPropagation()}>
+                      <div className="popover-head">
+                        <h5>Customize columns</h5>
+                        <span className="po-close" onClick={() => setColsOpen(false)}><Icon.X /></span>
+                      </div>
+                      <div className="po-section">
+                        <div className="po-label">Show columns</div>
+                        {ALL_COLS.map((col) =>
+                        <label key={col.id} className={`po-row ${col.required ? "disabled" : ""}`}>
+                            <input type="checkbox"
+                          checked={!!visibleCols[col.id]}
+                          disabled={col.required}
+                          onChange={(e) => setVisibleCols({ ...visibleCols, [col.id]: e.target.checked })} />
+                            <span>{col.label}{col.required && <em style={{ color: "var(--ink-3)", fontStyle: "normal", marginLeft: 6, fontSize: 11 }}>required</em>}</span>
+                          </label>
+                        )}
+                      </div>
+                      <div className="po-foot">
+                        <button className="btn btn-ghost" onClick={() => setVisibleCols(Object.fromEntries(ALL_COLS.map((c) => [c.id, true])))}>Reset</button>
+                        <button className="btn btn-primary" onClick={() => setColsOpen(false)}>Done</button>
+                      </div>
+                    </div>
+                    }
+                </div>
+              </div>
+            </div>
+            <CampaignTable rows={rows} onApply={applyChange} insightLevel={t.insightLevel} onProductOpen={(product, campaign) => setSelectedProduct({ product, campaign })} visibleCols={visibleCols} focus={focus} />
+          </div>
+
+          <div style={{ fontSize: 12, color: "var(--ink-3)", textAlign: "center", marginTop: 8, lineHeight: 1.6 }}>
+            Recommendations are generated automatically from bid, budget, funnel and creative signals. <br />
+            We only flag issues the advertising engine can improve.
+          </div>
+          </React.Fragment>
+          }
+        </div>
+      </div>
+
+      <GoalModal open={modalOpen} initial="bestsellers"
+      onClose={() => setModalOpen(false)}
+      onSelect={(g) => {
+        setModalOpen(false);
+        setGoal(g);
+        setToast("Campaign goal set — dashboard re-tuned");
+      }} />
+
+      {tip && <Tip data={tip} />}
+      {info && <InfoPanel open={!!info} anchorRect={info.rect} onClose={() => setInfo(null)} onGo={goToRecs} />}
+
+      <div className={`toast ${toast ? "show" : ""}`}>
+        <span className="tick-ico"><Icon.Check /></span>{toast}
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Icons" />
+        <TweakRadio label="Icon size" value={t.iconSize}
+        options={["small", "medium", "large"]}
+        onChange={(v) => setTweak("iconSize", v)} />
+        <TweakSection label="Layout" />
+        <TweakRadio label="Density" value={t.density}
+        options={["compact", "comfortable", "spacious"]}
+        onChange={(v) => setTweak("density", v)} />
+        <TweakSection label="Theme" />
+        <TweakColor label="Accent color" value={t.accentColor}
+        onChange={(v) => setTweak("accentColor", v)} />
+        <TweakSection label="Features" />
+        <TweakToggle label="Show explainability tips" value={t.showExplainability}
+        onChange={(v) => setTweak("showExplainability", v)} />
+        <TweakRadio label="Insight level" value={t.insightLevel}
+        options={["campaign", "product"]}
+        onChange={(v) => setTweak("insightLevel", v)} />
+      </TweaksPanel>
+    </div>);
+
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
